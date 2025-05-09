@@ -38,6 +38,12 @@ namespace HotelManagementSystem.App.ViewModels
         private ViewModelBase? _currentView;
         private bool _isViewingList = true;
         
+        // Delete confirmation
+        private bool _isConfirmingDelete;
+        private string _deleteConfirmationTitle = string.Empty;
+        private string _deleteConfirmationMessage = string.Empty;
+        private DeleteItemType _deleteItemType;
+        
         // Command properties
         public ICommand AddRoomCommand { get; }
         public ICommand EditRoomCommand { get; }
@@ -50,6 +56,17 @@ namespace HotelManagementSystem.App.ViewModels
         public ICommand DeleteReservationCommand { get; }
         public ICommand RefreshDataCommand { get; }
         public ICommand BackToListCommand { get; }
+        public ICommand ConfirmDeleteCommand { get; }
+        public ICommand CancelDeleteCommand { get; }
+        
+        // Delete item type enum
+        private enum DeleteItemType
+        {
+            None,
+            Room,
+            Customer,
+            Reservation
+        }
         
         public ObservableCollection<Reservation>? RecentReservations
         {
@@ -161,6 +178,24 @@ namespace HotelManagementSystem.App.ViewModels
             get => _dialogService;
             set => _dialogService = value;
         }
+        
+        public bool IsConfirmingDelete
+        {
+            get => _isConfirmingDelete;
+            set => SetProperty(ref _isConfirmingDelete, value);
+        }
+        
+        public string DeleteConfirmationTitle
+        {
+            get => _deleteConfirmationTitle;
+            set => SetProperty(ref _deleteConfirmationTitle, value);
+        }
+        
+        public string DeleteConfirmationMessage
+        {
+            get => _deleteConfirmationMessage;
+            set => SetProperty(ref _deleteConfirmationMessage, value);
+        }
 
         public MainWindowViewModel(DbContextOptions<HotelDbContext> dbOptions)
         {
@@ -188,18 +223,22 @@ namespace HotelManagementSystem.App.ViewModels
             // Initialize commands
             AddRoomCommand = new RelayCommand(_ => AddRoom());
             EditRoomCommand = new RelayCommand(_ => EditRoom(), _ => SelectedRoom != null);
-            DeleteRoomCommand = new RelayCommand(async _ => await DeleteRoomAsync(), _ => SelectedRoom != null);
+            DeleteRoomCommand = new RelayCommand(_ => ShowDeleteConfirmation(DeleteItemType.Room), _ => SelectedRoom != null);
             
             AddCustomerCommand = new RelayCommand(_ => AddCustomer());
             EditCustomerCommand = new RelayCommand(_ => EditCustomer(), _ => SelectedCustomer != null);
-            DeleteCustomerCommand = new RelayCommand(async _ => await DeleteCustomerAsync(), _ => SelectedCustomer != null);
+            DeleteCustomerCommand = new RelayCommand(_ => ShowDeleteConfirmation(DeleteItemType.Customer), _ => SelectedCustomer != null);
             
             AddReservationCommand = new RelayCommand(_ => AddReservation());
             EditReservationCommand = new RelayCommand(_ => EditReservation(), _ => SelectedReservation != null);
-            DeleteReservationCommand = new RelayCommand(async _ => await DeleteReservationAsync(), _ => SelectedReservation != null);
+            DeleteReservationCommand = new RelayCommand(_ => ShowDeleteConfirmation(DeleteItemType.Reservation), _ => SelectedReservation != null);
             
             RefreshDataCommand = new RelayCommand(async _ => await LoadDataAsync());
             BackToListCommand = new RelayCommand(_ => ShowListView());
+            
+            // Delete confirmation commands
+            ConfirmDeleteCommand = new RelayCommand(async _ => await ConfirmDeleteAsync());
+            CancelDeleteCommand = new RelayCommand(_ => CancelDelete());
 
             // Load initial data
             LoadDataAsync().ConfigureAwait(false);
@@ -397,45 +436,6 @@ namespace HotelManagementSystem.App.ViewModels
             ShowListView();
         }
         
-        private async Task DeleteRoomAsync()
-        {
-            if (SelectedRoom == null || DialogService == null) return;
-            
-            // Show confirmation dialog
-            var roomNumber = SelectedRoom.RoomNumber;
-            var confirmed = await DialogService.ShowConfirmationAsync(
-                "Delete Room", 
-                $"Are you sure you want to delete room {roomNumber}? This action cannot be undone.");
-            
-            if (!confirmed) return;
-            
-            using (var context = new HotelDbContext(_dbOptions))
-            {
-                var roomRepo = new RoomRepository(context);
-                var reservationRepo = new ReservationRepository(context);
-                
-                // Check if room has any reservations
-                var hasReservations = await reservationRepo.HasReservationsForRoomAsync(SelectedRoom.Id);
-                if (hasReservations)
-                {
-                    await DialogService.ShowConfirmationAsync(
-                        "Cannot Delete Room",
-                        $"Room {roomNumber} has existing reservations and cannot be deleted. Please delete the reservations first.");
-                    return;
-                }
-                
-                var room = await roomRepo.GetByIdAsync(SelectedRoom.Id);
-                if (room != null)
-                {
-                    await roomRepo.DeleteAsync(room);
-                    await roomRepo.SaveChangesAsync();
-                    
-                    // Refresh rooms list
-                    await LoadRoomsAsync();
-                }
-            }
-        }
-        
         // Customer operations
         private void AddCustomer()
         {
@@ -484,45 +484,6 @@ namespace HotelManagementSystem.App.ViewModels
             
             // Go back to list view
             ShowListView();
-        }
-        
-        private async Task DeleteCustomerAsync()
-        {
-            if (SelectedCustomer == null || DialogService == null) return;
-            
-            // Show confirmation dialog
-            var customerName = $"{SelectedCustomer.FirstName} {SelectedCustomer.LastName}";
-            var confirmed = await DialogService.ShowConfirmationAsync(
-                "Delete Customer", 
-                $"Are you sure you want to delete customer {customerName}? This action cannot be undone.");
-            
-            if (!confirmed) return;
-            
-            using (var context = new HotelDbContext(_dbOptions))
-            {
-                var customerRepo = new CustomerRepository(context);
-                var reservationRepo = new ReservationRepository(context);
-                
-                // Check if customer has any reservations
-                var hasReservations = await reservationRepo.HasReservationsForCustomerAsync(SelectedCustomer.Id);
-                if (hasReservations)
-                {
-                    await DialogService.ShowConfirmationAsync(
-                        "Cannot Delete Customer",
-                        $"Customer {customerName} has existing reservations and cannot be deleted. Please delete the reservations first.");
-                    return;
-                }
-                
-                var customer = await customerRepo.GetByIdAsync(SelectedCustomer.Id);
-                if (customer != null)
-                {
-                    await customerRepo.DeleteAsync(customer);
-                    await customerRepo.SaveChangesAsync();
-                    
-                    // Refresh customers list
-                    await LoadCustomersAsync();
-                }
-            }
         }
         
         // Reservation operations
@@ -578,18 +539,142 @@ namespace HotelManagementSystem.App.ViewModels
             ShowListView();
         }
         
-        private async Task DeleteReservationAsync()
+        private void OnFormCancelled()
         {
-            if (SelectedReservation == null || DialogService == null) return;
+            ShowListView();
+        }
+
+        // Delete confirmation methods
+        private void ShowDeleteConfirmation(DeleteItemType itemType)
+        {
+            _deleteItemType = itemType;
             
-            // Show confirmation dialog
-            var customerName = SelectedReservation.Customer?.FullName ?? "Unknown";
-            var roomNumber = SelectedReservation.Room?.RoomNumber ?? "Unknown";
-            var confirmed = await DialogService.ShowConfirmationAsync(
-                "Delete Reservation", 
-                $"Are you sure you want to delete the reservation for {customerName} in room {roomNumber}? This action cannot be undone.");
+            switch (itemType)
+            {
+                case DeleteItemType.Room:
+                    if (SelectedRoom != null)
+                    {
+                        DeleteConfirmationTitle = "Delete Room";
+                        DeleteConfirmationMessage = $"Are you sure you want to delete room {SelectedRoom.RoomNumber}? This action cannot be undone.";
+                    }
+                    break;
+                    
+                case DeleteItemType.Customer:
+                    if (SelectedCustomer != null)
+                    {
+                        DeleteConfirmationTitle = "Delete Customer";
+                        DeleteConfirmationMessage = $"Are you sure you want to delete customer {SelectedCustomer.FirstName} {SelectedCustomer.LastName}? This action cannot be undone.";
+                    }
+                    break;
+                    
+                case DeleteItemType.Reservation:
+                    if (SelectedReservation != null)
+                    {
+                        var customerName = SelectedReservation.Customer?.FullName ?? "Unknown";
+                        var roomNumber = SelectedReservation.Room?.RoomNumber ?? "Unknown";
+                        DeleteConfirmationTitle = "Delete Reservation";
+                        DeleteConfirmationMessage = $"Are you sure you want to delete the reservation for {customerName} in room {roomNumber}? This action cannot be undone.";
+                    }
+                    break;
+            }
             
-            if (!confirmed) return;
+            IsConfirmingDelete = true;
+        }
+        
+        private void CancelDelete()
+        {
+            IsConfirmingDelete = false;
+            _deleteItemType = DeleteItemType.None;
+        }
+        
+        private async Task ConfirmDeleteAsync()
+        {
+            switch (_deleteItemType)
+            {
+                case DeleteItemType.Room:
+                    await DeleteRoomInternalAsync();
+                    break;
+                    
+                case DeleteItemType.Customer:
+                    await DeleteCustomerInternalAsync();
+                    break;
+                    
+                case DeleteItemType.Reservation:
+                    await DeleteReservationInternalAsync();
+                    break;
+            }
+            
+            IsConfirmingDelete = false;
+            _deleteItemType = DeleteItemType.None;
+        }
+        
+        private async Task DeleteRoomInternalAsync()
+        {
+            if (SelectedRoom == null) return;
+            
+            using (var context = new HotelDbContext(_dbOptions))
+            {
+                var roomRepo = new RoomRepository(context);
+                var reservationRepo = new ReservationRepository(context);
+                
+                // Check if room has any reservations
+                var hasReservations = await reservationRepo.HasReservationsForRoomAsync(SelectedRoom.Id);
+                if (hasReservations)
+                {
+                    // Show error message in the same panel
+                    DeleteConfirmationTitle = "Cannot Delete Room";
+                    DeleteConfirmationMessage = $"Room {SelectedRoom.RoomNumber} has existing reservations and cannot be deleted. Please delete the reservations first.";
+                    return;
+                }
+                
+                var room = await roomRepo.GetByIdAsync(SelectedRoom.Id);
+                if (room != null)
+                {
+                    await roomRepo.DeleteAsync(room);
+                    await roomRepo.SaveChangesAsync();
+                    
+                    // Refresh rooms list
+                    await LoadRoomsAsync();
+                    IsConfirmingDelete = false;
+                }
+            }
+        }
+        
+        private async Task DeleteCustomerInternalAsync()
+        {
+            if (SelectedCustomer == null) return;
+            
+            using (var context = new HotelDbContext(_dbOptions))
+            {
+                var customerRepo = new CustomerRepository(context);
+                var reservationRepo = new ReservationRepository(context);
+                
+                // Check if customer has any reservations
+                var hasReservations = await reservationRepo.HasReservationsForCustomerAsync(SelectedCustomer.Id);
+                if (hasReservations)
+                {
+                    // Show error message in the same panel
+                    DeleteConfirmationTitle = "Cannot Delete Customer";
+                    DeleteConfirmationMessage = $"Customer {SelectedCustomer.FirstName} {SelectedCustomer.LastName} has existing reservations and cannot be deleted. Please delete the reservations first.";
+                    return;
+                }
+                
+                var customer = await customerRepo.GetByIdAsync(SelectedCustomer.Id);
+                if (customer != null)
+                {
+                    await customerRepo.DeleteAsync(customer);
+                    await customerRepo.SaveChangesAsync();
+                    
+                    // Refresh customers list
+                    await LoadCustomersAsync();
+                    IsConfirmingDelete = false;
+                }
+            }
+        }
+        
+        private async Task DeleteReservationInternalAsync()
+        {
+            if (SelectedReservation == null) return;
             
             using (var context = new HotelDbContext(_dbOptions))
             {
@@ -604,13 +689,9 @@ namespace HotelManagementSystem.App.ViewModels
                     await LoadReservationsAsync();
                     // Also refresh occupancy data as it may have changed
                     await LoadOccupancyDataAsync();
+                    IsConfirmingDelete = false;
                 }
             }
-        }
-        
-        private void OnFormCancelled()
-        {
-            ShowListView();
         }
     }
 } 
