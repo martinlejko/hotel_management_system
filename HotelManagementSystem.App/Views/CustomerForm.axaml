@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:HotelManagementSystem.App.ViewModels"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="500"
-             x:Class="HotelManagementSystem.App.Views.CustomerForm">
+             x:Class="HotelManagementSystem.App.Views.CustomerForm"
+             x:DataType="vm:CustomerFormViewModel">
 
     <ScrollViewer>
         <Grid RowDefinitions="*,Auto" Margin="20">

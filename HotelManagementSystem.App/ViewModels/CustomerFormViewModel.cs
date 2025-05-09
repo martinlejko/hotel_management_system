@@ -20,19 +20,37 @@ namespace HotelManagementSystem.App.ViewModels
         public string FirstName
         {
             get => _firstName;
-            set => SetProperty(ref _firstName, value);
+            set 
+            { 
+                if (SetProperty(ref _firstName, value))
+                {
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
         
         public string LastName
         {
             get => _lastName;
-            set => SetProperty(ref _lastName, value);
+            set 
+            { 
+                if (SetProperty(ref _lastName, value))
+                {
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
         
         public string Email
         {
             get => _email;
-            set => SetProperty(ref _email, value);
+            set 
+            { 
+                if (SetProperty(ref _email, value))
+                {
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
         
         public string? PhoneNumber
@@ -71,8 +89,15 @@ namespace HotelManagementSystem.App.ViewModels
                 DateOfBirth = customer.DateOfBirth;
             }
             
-            SaveCommand = new RelayCommand(_ => Save());
+            SaveCommand = new RelayCommand(_ => Save(), _ => CanSave());
             CancelCommand = new RelayCommand(_ => Cancel());
+        }
+        
+        private bool CanSave()
+        {
+            return !string.IsNullOrWhiteSpace(FirstName) && 
+                   !string.IsNullOrWhiteSpace(LastName) && 
+                   !string.IsNullOrWhiteSpace(Email);
         }
         
         private void Save()

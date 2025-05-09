@@ -21,7 +21,13 @@ namespace HotelManagementSystem.App.ViewModels
         public string RoomNumber
         {
             get => _roomNumber;
-            set => SetProperty(ref _roomNumber, value);
+            set 
+            { 
+                if (SetProperty(ref _roomNumber, value))
+                {
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
         
         public RoomType SelectedRoomType
@@ -33,13 +39,25 @@ namespace HotelManagementSystem.App.ViewModels
         public int Capacity
         {
             get => _capacity;
-            set => SetProperty(ref _capacity, value);
+            set 
+            { 
+                if (SetProperty(ref _capacity, value))
+                {
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
         
         public decimal PricePerNight
         {
             get => _pricePerNight;
-            set => SetProperty(ref _pricePerNight, value);
+            set 
+            { 
+                if (SetProperty(ref _pricePerNight, value))
+                {
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
         
         public string? Description
@@ -74,8 +92,13 @@ namespace HotelManagementSystem.App.ViewModels
                 IsAvailable = room.IsAvailable;
             }
             
-            SaveCommand = new RelayCommand(_ => Save());
+            SaveCommand = new RelayCommand(_ => Save(), _ => CanSave());
             CancelCommand = new RelayCommand(_ => Cancel());
+        }
+        
+        private bool CanSave()
+        {
+            return !string.IsNullOrWhiteSpace(RoomNumber) && Capacity > 0 && PricePerNight >= 0;
         }
         
         private void Save()

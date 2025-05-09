@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Threading;
 
 namespace HotelManagementSystem.App.ViewModels
 {
@@ -43,7 +44,13 @@ namespace HotelManagementSystem.App.ViewModels
         public Customer? SelectedCustomer
         {
             get => _selectedCustomer;
-            set => SetProperty(ref _selectedCustomer, value);
+            set 
+            { 
+                if (SetProperty(ref _selectedCustomer, value))
+                {
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
         
         public Room? SelectedRoom
@@ -54,6 +61,7 @@ namespace HotelManagementSystem.App.ViewModels
                 if (SetProperty(ref _selectedRoom, value))
                 {
                     CalculateTotalPrice();
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -73,6 +81,7 @@ namespace HotelManagementSystem.App.ViewModels
                     
                     CalculateTotalPrice();
                     LoadAvailableRoomsAsync().ConfigureAwait(false);
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -92,6 +101,7 @@ namespace HotelManagementSystem.App.ViewModels
                     
                     CalculateTotalPrice();
                     LoadAvailableRoomsAsync().ConfigureAwait(false);
+                    (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -134,85 +144,114 @@ namespace HotelManagementSystem.App.ViewModels
                 SpecialRequests = reservation.SpecialRequests;
             }
             
-            SaveCommand = new RelayCommand(_ => Save());
+            SaveCommand = new RelayCommand(_ => Save(), _ => CanSave());
             CancelCommand = new RelayCommand(_ => Cancel());
             
             // Load data
-            LoadCustomersAsync().ConfigureAwait(false);
-            LoadAvailableRoomsAsync().ConfigureAwait(false);
+            Task.Run(async () => await LoadInitialDataAsync());
+        }
+        
+        private async Task LoadInitialDataAsync()
+        {
+            await LoadCustomersAsync();
+            await LoadAvailableRoomsAsync();
         }
         
         private async Task LoadCustomersAsync()
         {
-            using (var context = new HotelDbContext((DbContextOptions<HotelDbContext>)_dbOptions))
+            try
             {
-                var customerRepo = new CustomerRepository(context);
-                var customers = await customerRepo.GetAllAsync();
-                
-                Customers.Clear();
-                foreach (var customer in customers)
+                using (var context = new HotelDbContext((DbContextOptions<HotelDbContext>)_dbOptions))
                 {
-                    Customers.Add(customer);
+                    var customerRepo = new CustomerRepository(context);
+                    var customers = await customerRepo.GetAllAsync();
+                    
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        Customers.Clear();
+                        foreach (var customer in customers)
+                        {
+                            Customers.Add(customer);
+                        }
+                        
+                        // Set selected customer if editing
+                        if (_originalReservation != null && _originalReservation.CustomerId > 0)
+                        {
+                            SelectedCustomer = Customers.FirstOrDefault(c => c.Id == _originalReservation.CustomerId);
+                        }
+                        else if (Customers.Count > 0)
+                        {
+                            SelectedCustomer = Customers[0];
+                        }
+                        
+                        (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                    });
                 }
-                
-                // Set selected customer if editing
-                if (_originalReservation != null && _originalReservation.CustomerId > 0)
-                {
-                    SelectedCustomer = Customers.FirstOrDefault(c => c.Id == _originalReservation.CustomerId);
-                }
-                else if (Customers.Count > 0)
-                {
-                    SelectedCustomer = Customers[0];
-                }
+            }
+            catch (Exception ex)
+            {
+                // Log error
+                Console.WriteLine($"Error loading customers: {ex.Message}");
             }
         }
         
         private async Task LoadAvailableRoomsAsync()
         {
-            using (var context = new HotelDbContext((DbContextOptions<HotelDbContext>)_dbOptions))
+            try
             {
-                var roomRepo = new RoomRepository(context);
-                var reservationRepo = new ReservationRepository(context);
-                
-                // Get all rooms
-                var allRooms = await roomRepo.GetAllAsync();
-                
-                // Get rooms that are already booked for the selected date range
-                var bookedRoomIds = await reservationRepo.GetBookedRoomIdsAsync(
-                    CheckInDate, 
-                    CheckOutDate,
-                    _originalReservation?.Id ?? 0); // Exclude current reservation if editing
-                
-                // Filter available rooms
-                var availableRooms = allRooms.Where(r => 
-                    r.IsAvailable && 
-                    !bookedRoomIds.Contains(r.Id)).ToList();
-                
-                AvailableRooms.Clear();
-                foreach (var room in availableRooms)
+                using (var context = new HotelDbContext((DbContextOptions<HotelDbContext>)_dbOptions))
                 {
-                    AvailableRooms.Add(room);
-                }
-                
-                // Set selected room if editing
-                if (_originalReservation != null && _originalReservation.RoomId > 0)
-                {
-                    // For editing, always include the original room in the list
-                    if (!AvailableRooms.Any(r => r.Id == _originalReservation.RoomId))
-                    {
-                        var originalRoom = await roomRepo.GetByIdAsync(_originalReservation.RoomId);
-                        if (originalRoom != null)
-                        {
-                            AvailableRooms.Add(originalRoom);
-                        }
-                    }
+                    var roomRepo = new RoomRepository(context);
+                    var reservationRepo = new ReservationRepository(context);
                     
-                    SelectedRoom = AvailableRooms.FirstOrDefault(r => r.Id == _originalReservation.RoomId);
+                    // Get all rooms
+                    var allRooms = await roomRepo.GetAllAsync();
+                    
+                    // Get rooms that are already booked for the selected date range
+                    var bookedRoomIds = await reservationRepo.GetBookedRoomIdsAsync(
+                        CheckInDate, 
+                        CheckOutDate,
+                        _originalReservation?.Id ?? 0); // Exclude current reservation if editing
+                    
+                    // Filter available rooms
+                    var availableRooms = allRooms.Where(r => 
+                        r.IsAvailable && 
+                        !bookedRoomIds.Contains(r.Id)).ToList();
+                    
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        AvailableRooms.Clear();
+                        foreach (var room in availableRooms)
+                        {
+                            AvailableRooms.Add(room);
+                        }
+                        
+                        // Set selected room if editing
+                        if (_originalReservation != null && _originalReservation.RoomId > 0)
+                        {
+                            // For edit, we need to include the currently selected room even if it's booked
+                            var currentRoom = allRooms.FirstOrDefault(r => r.Id == _originalReservation.RoomId);
+                            if (currentRoom != null && !AvailableRooms.Contains(currentRoom))
+                            {
+                                AvailableRooms.Add(currentRoom);
+                            }
+                            
+                            SelectedRoom = AvailableRooms.FirstOrDefault(r => r.Id == _originalReservation.RoomId);
+                        }
+                        else if (AvailableRooms.Count > 0)
+                        {
+                            SelectedRoom = AvailableRooms[0];
+                        }
+                        
+                        CalculateTotalPrice();
+                        (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                    });
                 }
-                else if (AvailableRooms.Count > 0)
-                {
-                    SelectedRoom = AvailableRooms[0];
-                }
+            }
+            catch (Exception ex)
+            {
+                // Log error
+                Console.WriteLine($"Error loading available rooms: {ex.Message}");
             }
         }
         
@@ -228,10 +267,14 @@ namespace HotelManagementSystem.App.ViewModels
             }
         }
         
+        private bool CanSave()
+        {
+            return SelectedCustomer != null && SelectedRoom != null && CheckOutDate > CheckInDate;
+        }
+        
         private void Save()
         {
-            // Validate input
-            if (SelectedCustomer == null || SelectedRoom == null || CheckOutDate <= CheckInDate)
+            if (SelectedCustomer == null || SelectedRoom == null)
             {
                 // In a real app, show an error message
                 return;
@@ -247,10 +290,9 @@ namespace HotelManagementSystem.App.ViewModels
             reservation.TotalPrice = TotalPrice;
             reservation.SpecialRequests = SpecialRequests;
             
-            if (_originalReservation == null)
-            {
-                reservation.CreatedAt = DateTime.Now;
-            }
+            // Set navigation properties for display
+            reservation.Customer = SelectedCustomer;
+            reservation.Room = SelectedRoom;
             
             // Notify that save is completed
             SaveCompleted?.Invoke(reservation);

@@ -321,11 +321,11 @@ namespace HotelManagementSystem.App.ViewModels
         // Room operations
         private void AddRoom()
         {
-            var roomFormViewModel = new RoomFormViewModel(null);
-            roomFormViewModel.SaveCompleted += OnRoomSaveCompleted;
-            roomFormViewModel.CancelRequested += OnFormCancelled;
+            var viewModel = new RoomFormViewModel();
+            viewModel.SaveCompleted += OnRoomSaveCompleted;
+            viewModel.CancelRequested += OnFormCancelled;
             
-            CurrentView = roomFormViewModel;
+            CurrentView = viewModel;
             IsViewingList = false;
         }
         
@@ -333,11 +333,11 @@ namespace HotelManagementSystem.App.ViewModels
         {
             if (SelectedRoom == null) return;
             
-            var roomFormViewModel = new RoomFormViewModel(SelectedRoom);
-            roomFormViewModel.SaveCompleted += OnRoomSaveCompleted;
-            roomFormViewModel.CancelRequested += OnFormCancelled;
+            var viewModel = new RoomFormViewModel(SelectedRoom);
+            viewModel.SaveCompleted += OnRoomSaveCompleted;
+            viewModel.CancelRequested += OnFormCancelled;
             
-            CurrentView = roomFormViewModel;
+            CurrentView = viewModel;
             IsViewingList = false;
         }
         
@@ -390,11 +390,11 @@ namespace HotelManagementSystem.App.ViewModels
         // Customer operations
         private void AddCustomer()
         {
-            var customerFormViewModel = new CustomerFormViewModel(null);
-            customerFormViewModel.SaveCompleted += OnCustomerSaveCompleted;
-            customerFormViewModel.CancelRequested += OnFormCancelled;
+            var viewModel = new CustomerFormViewModel();
+            viewModel.SaveCompleted += OnCustomerSaveCompleted;
+            viewModel.CancelRequested += OnFormCancelled;
             
-            CurrentView = customerFormViewModel;
+            CurrentView = viewModel;
             IsViewingList = false;
         }
         
@@ -402,11 +402,11 @@ namespace HotelManagementSystem.App.ViewModels
         {
             if (SelectedCustomer == null) return;
             
-            var customerFormViewModel = new CustomerFormViewModel(SelectedCustomer);
-            customerFormViewModel.SaveCompleted += OnCustomerSaveCompleted;
-            customerFormViewModel.CancelRequested += OnFormCancelled;
+            var viewModel = new CustomerFormViewModel(SelectedCustomer);
+            viewModel.SaveCompleted += OnCustomerSaveCompleted;
+            viewModel.CancelRequested += OnFormCancelled;
             
-            CurrentView = customerFormViewModel;
+            CurrentView = viewModel;
             IsViewingList = false;
         }
         
@@ -459,11 +459,11 @@ namespace HotelManagementSystem.App.ViewModels
         // Reservation operations
         private void AddReservation()
         {
-            var reservationFormViewModel = new ReservationFormViewModel(_dbOptions, null);
-            reservationFormViewModel.SaveCompleted += OnReservationSaveCompleted;
-            reservationFormViewModel.CancelRequested += OnFormCancelled;
+            var viewModel = new ReservationFormViewModel(_dbOptions);
+            viewModel.SaveCompleted += OnReservationSaveCompleted;
+            viewModel.CancelRequested += OnFormCancelled;
             
-            CurrentView = reservationFormViewModel;
+            CurrentView = viewModel;
             IsViewingList = false;
         }
         
@@ -471,11 +471,11 @@ namespace HotelManagementSystem.App.ViewModels
         {
             if (SelectedReservation == null) return;
             
-            var reservationFormViewModel = new ReservationFormViewModel(_dbOptions, SelectedReservation);
-            reservationFormViewModel.SaveCompleted += OnReservationSaveCompleted;
-            reservationFormViewModel.CancelRequested += OnFormCancelled;
+            var viewModel = new ReservationFormViewModel(_dbOptions, SelectedReservation);
+            viewModel.SaveCompleted += OnReservationSaveCompleted;
+            viewModel.CancelRequested += OnFormCancelled;
             
-            CurrentView = reservationFormViewModel;
+            CurrentView = viewModel;
             IsViewingList = false;
         }
         

@@ -5,6 +5,7 @@
         xmlns:vm="using:HotelManagementSystem.App.ViewModels"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="500"
         x:Class="HotelManagementSystem.App.Views.CustomerDialog"
+        x:DataType="vm:CustomerFormViewModel"
         Title="Customer Details"
         Width="400" Height="500"
         WindowStartupLocation="CenterOwner">

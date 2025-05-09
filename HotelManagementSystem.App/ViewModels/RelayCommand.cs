@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Input;
+using Avalonia.Threading;
 
 namespace HotelManagementSystem.App.ViewModels
 {
@@ -18,7 +19,8 @@ namespace HotelManagementSystem.App.ViewModels
 
         public void RaiseCanExecuteChanged()
         {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+            // Use Avalonia's Dispatcher to ensure we're on the UI thread
+            Dispatcher.UIThread.Post(() => CanExecuteChanged?.Invoke(this, EventArgs.Empty));
         }
 
         public bool CanExecute(object? parameter) => _canExecute == null || _canExecute(parameter);

@@ -3,8 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:HotelManagementSystem.App.ViewModels"
+             xmlns:models="using:HotelManagementSystem.Core.Models"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
-             x:Class="HotelManagementSystem.App.Views.ReservationForm">
+             x:Class="HotelManagementSystem.App.Views.ReservationForm"
+             x:DataType="vm:ReservationFormViewModel">
 
     <ScrollViewer>
         <Grid RowDefinitions="*,Auto" Margin="20">
@@ -14,7 +16,7 @@
                 <TextBlock Text="Customer:"/>
                 <ComboBox SelectedItem="{Binding SelectedCustomer}" ItemsSource="{Binding Customers}" HorizontalAlignment="Stretch">
                     <ComboBox.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="models:Customer">
                             <TextBlock Text="{Binding FullName}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
@@ -23,7 +25,7 @@
                 <TextBlock Text="Room:"/>
                 <ComboBox SelectedItem="{Binding SelectedRoom}" ItemsSource="{Binding AvailableRooms}" HorizontalAlignment="Stretch">
                     <ComboBox.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="models:Room">
                             <TextBlock Text="{Binding RoomNumber}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
