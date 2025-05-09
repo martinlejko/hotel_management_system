@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:HotelManagementSystem.App.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="500"
+             x:Class="HotelManagementSystem.App.Views.CustomerForm">
+
+    <ScrollViewer>
+        <Grid RowDefinitions="*,Auto" Margin="20">
+            <StackPanel Grid.Row="0" Spacing="10">
+                <TextBlock Text="Customer Details" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+                
+                <TextBlock Text="First Name:"/>
+                <TextBox Text="{Binding FirstName}" Watermark="Enter first name"/>
+                
+                <TextBlock Text="Last Name:"/>
+                <TextBox Text="{Binding LastName}" Watermark="Enter last name"/>
+                
+                <TextBlock Text="Email:"/>
+                <TextBox Text="{Binding Email}" Watermark="Enter email address"/>
+                
+                <TextBlock Text="Phone Number:"/>
+                <TextBox Text="{Binding PhoneNumber}" Watermark="Enter phone number"/>
+                
+                <TextBlock Text="Address:"/>
+                <TextBox Text="{Binding Address}" Height="60" TextWrapping="Wrap" AcceptsReturn="True"/>
+                
+                <TextBlock Text="Date of Birth:"/>
+                <DatePicker SelectedDate="{Binding DateOfBirth}"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+                <Button Content="Cancel" Command="{Binding CancelCommand}" Width="100"/>
+                <Button Content="Save" Command="{Binding SaveCommand}" Background="#2196F3" Foreground="White" Width="100"/>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl> 

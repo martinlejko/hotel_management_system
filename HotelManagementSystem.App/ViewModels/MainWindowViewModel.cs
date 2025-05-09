@@ -30,6 +30,24 @@ namespace HotelManagementSystem.App.ViewModels
         private string? _searchText;
         private DateTime _selectedDate;
         private double _occupancyRate;
+        private Room? _selectedRoom;
+        private Customer? _selectedCustomer;
+        private Reservation? _selectedReservation;
+        private ViewModelBase? _currentView;
+        private bool _isViewingList = true;
+        
+        // Command properties
+        public ICommand AddRoomCommand { get; }
+        public ICommand EditRoomCommand { get; }
+        public ICommand DeleteRoomCommand { get; }
+        public ICommand AddCustomerCommand { get; }
+        public ICommand EditCustomerCommand { get; }
+        public ICommand DeleteCustomerCommand { get; }
+        public ICommand AddReservationCommand { get; }
+        public ICommand EditReservationCommand { get; }
+        public ICommand DeleteReservationCommand { get; }
+        public ICommand RefreshDataCommand { get; }
+        public ICommand BackToListCommand { get; }
         
         public ObservableCollection<Reservation>? RecentReservations
         {
@@ -84,6 +102,36 @@ namespace HotelManagementSystem.App.ViewModels
             get => _occupancyRate;
             set => SetProperty(ref _occupancyRate, value);
         }
+        
+        public Room? SelectedRoom
+        {
+            get => _selectedRoom;
+            set => SetProperty(ref _selectedRoom, value);
+        }
+        
+        public Customer? SelectedCustomer
+        {
+            get => _selectedCustomer;
+            set => SetProperty(ref _selectedCustomer, value);
+        }
+        
+        public Reservation? SelectedReservation
+        {
+            get => _selectedReservation;
+            set => SetProperty(ref _selectedReservation, value);
+        }
+        
+        public ViewModelBase? CurrentView
+        {
+            get => _currentView;
+            set => SetProperty(ref _currentView, value);
+        }
+        
+        public bool IsViewingList
+        {
+            get => _isViewingList;
+            set => SetProperty(ref _isViewingList, value);
+        }
 
         public MainWindowViewModel(DbContextOptions<HotelDbContext> dbOptions)
         {
@@ -106,9 +154,32 @@ namespace HotelManagementSystem.App.ViewModels
             // Initialize properties
             SelectedDate = DateTime.Today;
             SearchText = string.Empty;
+            IsViewingList = true;
+            
+            // Initialize commands
+            AddRoomCommand = new RelayCommand(_ => AddRoom());
+            EditRoomCommand = new RelayCommand(_ => EditRoom(), _ => SelectedRoom != null);
+            DeleteRoomCommand = new RelayCommand(async _ => await DeleteRoomAsync(), _ => SelectedRoom != null);
+            
+            AddCustomerCommand = new RelayCommand(_ => AddCustomer());
+            EditCustomerCommand = new RelayCommand(_ => EditCustomer(), _ => SelectedCustomer != null);
+            DeleteCustomerCommand = new RelayCommand(async _ => await DeleteCustomerAsync(), _ => SelectedCustomer != null);
+            
+            AddReservationCommand = new RelayCommand(_ => AddReservation());
+            EditReservationCommand = new RelayCommand(_ => EditReservation(), _ => SelectedReservation != null);
+            DeleteReservationCommand = new RelayCommand(async _ => await DeleteReservationAsync(), _ => SelectedReservation != null);
+            
+            RefreshDataCommand = new RelayCommand(async _ => await LoadDataAsync());
+            BackToListCommand = new RelayCommand(_ => ShowListView());
 
             // Load initial data
             LoadDataAsync().ConfigureAwait(false);
+        }
+        
+        private void ShowListView()
+        {
+            CurrentView = null;
+            IsViewingList = true;
         }
 
         private async Task LoadDataAsync()
@@ -245,6 +316,223 @@ namespace HotelManagementSystem.App.ViewModels
                     RecentReservations?.Add(reservation);
                 }
             }
+        }
+        
+        // Room operations
+        private void AddRoom()
+        {
+            var roomFormViewModel = new RoomFormViewModel(null);
+            roomFormViewModel.SaveCompleted += OnRoomSaveCompleted;
+            roomFormViewModel.CancelRequested += OnFormCancelled;
+            
+            CurrentView = roomFormViewModel;
+            IsViewingList = false;
+        }
+        
+        private void EditRoom()
+        {
+            if (SelectedRoom == null) return;
+            
+            var roomFormViewModel = new RoomFormViewModel(SelectedRoom);
+            roomFormViewModel.SaveCompleted += OnRoomSaveCompleted;
+            roomFormViewModel.CancelRequested += OnFormCancelled;
+            
+            CurrentView = roomFormViewModel;
+            IsViewingList = false;
+        }
+        
+        private async void OnRoomSaveCompleted(Room room)
+        {
+            using (var context = new HotelDbContext(_dbOptions))
+            {
+                var roomRepo = new RoomRepository(context);
+                
+                if (room.Id == 0)
+                {
+                    // New room
+                    await roomRepo.AddAsync(room);
+                }
+                else
+                {
+                    // Existing room
+                    await roomRepo.UpdateAsync(room);
+                }
+                
+                await roomRepo.SaveChangesAsync();
+            }
+            
+            // Refresh rooms list
+            await LoadRoomsAsync();
+            
+            // Go back to list view
+            ShowListView();
+        }
+        
+        private async Task DeleteRoomAsync()
+        {
+            if (SelectedRoom == null) return;
+            
+            using (var context = new HotelDbContext(_dbOptions))
+            {
+                var roomRepo = new RoomRepository(context);
+                var room = await roomRepo.GetByIdAsync(SelectedRoom.Id);
+                if (room != null)
+                {
+                    await roomRepo.DeleteAsync(room);
+                    await roomRepo.SaveChangesAsync();
+                }
+            }
+            
+            // Refresh rooms list
+            await LoadRoomsAsync();
+        }
+        
+        // Customer operations
+        private void AddCustomer()
+        {
+            var customerFormViewModel = new CustomerFormViewModel(null);
+            customerFormViewModel.SaveCompleted += OnCustomerSaveCompleted;
+            customerFormViewModel.CancelRequested += OnFormCancelled;
+            
+            CurrentView = customerFormViewModel;
+            IsViewingList = false;
+        }
+        
+        private void EditCustomer()
+        {
+            if (SelectedCustomer == null) return;
+            
+            var customerFormViewModel = new CustomerFormViewModel(SelectedCustomer);
+            customerFormViewModel.SaveCompleted += OnCustomerSaveCompleted;
+            customerFormViewModel.CancelRequested += OnFormCancelled;
+            
+            CurrentView = customerFormViewModel;
+            IsViewingList = false;
+        }
+        
+        private async void OnCustomerSaveCompleted(Customer customer)
+        {
+            using (var context = new HotelDbContext(_dbOptions))
+            {
+                var customerRepo = new CustomerRepository(context);
+                
+                if (customer.Id == 0)
+                {
+                    // New customer
+                    await customerRepo.AddAsync(customer);
+                }
+                else
+                {
+                    // Existing customer
+                    await customerRepo.UpdateAsync(customer);
+                }
+                
+                await customerRepo.SaveChangesAsync();
+            }
+            
+            // Refresh customers list
+            await LoadCustomersAsync();
+            
+            // Go back to list view
+            ShowListView();
+        }
+        
+        private async Task DeleteCustomerAsync()
+        {
+            if (SelectedCustomer == null) return;
+            
+            using (var context = new HotelDbContext(_dbOptions))
+            {
+                var customerRepo = new CustomerRepository(context);
+                var customer = await customerRepo.GetByIdAsync(SelectedCustomer.Id);
+                if (customer != null)
+                {
+                    await customerRepo.DeleteAsync(customer);
+                    await customerRepo.SaveChangesAsync();
+                }
+            }
+            
+            // Refresh customers list
+            await LoadCustomersAsync();
+        }
+        
+        // Reservation operations
+        private void AddReservation()
+        {
+            var reservationFormViewModel = new ReservationFormViewModel(_dbOptions, null);
+            reservationFormViewModel.SaveCompleted += OnReservationSaveCompleted;
+            reservationFormViewModel.CancelRequested += OnFormCancelled;
+            
+            CurrentView = reservationFormViewModel;
+            IsViewingList = false;
+        }
+        
+        private void EditReservation()
+        {
+            if (SelectedReservation == null) return;
+            
+            var reservationFormViewModel = new ReservationFormViewModel(_dbOptions, SelectedReservation);
+            reservationFormViewModel.SaveCompleted += OnReservationSaveCompleted;
+            reservationFormViewModel.CancelRequested += OnFormCancelled;
+            
+            CurrentView = reservationFormViewModel;
+            IsViewingList = false;
+        }
+        
+        private async void OnReservationSaveCompleted(Reservation reservation)
+        {
+            using (var context = new HotelDbContext(_dbOptions))
+            {
+                var reservationRepo = new ReservationRepository(context);
+                
+                if (reservation.Id == 0)
+                {
+                    // New reservation
+                    await reservationRepo.AddAsync(reservation);
+                }
+                else
+                {
+                    // Existing reservation
+                    await reservationRepo.UpdateAsync(reservation);
+                }
+                
+                await reservationRepo.SaveChangesAsync();
+            }
+            
+            // Refresh reservations list
+            await LoadReservationsAsync();
+            
+            // Also refresh occupancy data as it may have changed
+            await LoadOccupancyDataAsync();
+            
+            // Go back to list view
+            ShowListView();
+        }
+        
+        private async Task DeleteReservationAsync()
+        {
+            if (SelectedReservation == null) return;
+            
+            using (var context = new HotelDbContext(_dbOptions))
+            {
+                var reservationRepo = new ReservationRepository(context);
+                var reservation = await reservationRepo.GetByIdAsync(SelectedReservation.Id);
+                if (reservation != null)
+                {
+                    await reservationRepo.DeleteAsync(reservation);
+                    await reservationRepo.SaveChangesAsync();
+                }
+            }
+            
+            // Refresh reservations list
+            await LoadReservationsAsync();
+            // Also refresh occupancy data as it may have changed
+            await LoadOccupancyDataAsync();
+        }
+        
+        private void OnFormCancelled()
+        {
+            ShowListView();
         }
     }
 } 

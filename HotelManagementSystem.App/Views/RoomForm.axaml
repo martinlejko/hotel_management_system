@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:HotelManagementSystem.App.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
+             x:Class="HotelManagementSystem.App.Views.RoomForm">
+
+    <ScrollViewer>
+        <Grid RowDefinitions="*,Auto" Margin="20">
+            <StackPanel Grid.Row="0" Spacing="10">
+                <TextBlock Text="Room Details" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+                
+                <TextBlock Text="Room Number:"/>
+                <TextBox Text="{Binding RoomNumber}" Watermark="Enter room number"/>
+                
+                <TextBlock Text="Room Type:"/>
+                <ComboBox SelectedItem="{Binding SelectedRoomType}" ItemsSource="{Binding RoomTypes}" HorizontalAlignment="Stretch"/>
+                
+                <TextBlock Text="Capacity:"/>
+                <NumericUpDown Value="{Binding Capacity}" Minimum="1" Maximum="10" Increment="1"/>
+                
+                <TextBlock Text="Price per Night:"/>
+                <NumericUpDown Value="{Binding PricePerNight}" Minimum="0" Increment="10"/>
+                
+                <TextBlock Text="Description:"/>
+                <TextBox Text="{Binding Description}" Height="60" TextWrapping="Wrap" AcceptsReturn="True"/>
+                
+                <CheckBox IsChecked="{Binding IsAvailable}" Content="Available"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+                <Button Content="Cancel" Command="{Binding CancelCommand}" Width="100"/>
+                <Button Content="Save" Command="{Binding SaveCommand}" Background="#2196F3" Foreground="White" Width="100"/>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl> 

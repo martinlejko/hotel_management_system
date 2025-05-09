@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:HotelManagementSystem.App.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+             x:Class="HotelManagementSystem.App.Views.ReservationForm">
+
+    <ScrollViewer>
+        <Grid RowDefinitions="*,Auto" Margin="20">
+            <StackPanel Grid.Row="0" Spacing="10">
+                <TextBlock Text="Reservation Details" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+                
+                <TextBlock Text="Customer:"/>
+                <ComboBox SelectedItem="{Binding SelectedCustomer}" ItemsSource="{Binding Customers}" HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding FullName}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                
+                <TextBlock Text="Room:"/>
+                <ComboBox SelectedItem="{Binding SelectedRoom}" ItemsSource="{Binding AvailableRooms}" HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding RoomNumber}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                
+                <TextBlock Text="Check-in Date:"/>
+                <DatePicker SelectedDate="{Binding CheckInDate}"/>
+                
+                <TextBlock Text="Check-out Date:"/>
+                <DatePicker SelectedDate="{Binding CheckOutDate}"/>
+                
+                <TextBlock Text="Status:"/>
+                <ComboBox SelectedItem="{Binding SelectedStatus}" ItemsSource="{Binding ReservationStatuses}" HorizontalAlignment="Stretch"/>
+                
+                <TextBlock Text="Total Price:"/>
+                <TextBox Text="{Binding TotalPrice}" IsReadOnly="True"/>
+                
+                <TextBlock Text="Special Requests:"/>
+                <TextBox Text="{Binding SpecialRequests}" Height="80" TextWrapping="Wrap" AcceptsReturn="True"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+                <Button Content="Cancel" Command="{Binding CancelCommand}" Width="100"/>
+                <Button Content="Save" Command="{Binding SaveCommand}" Background="#2196F3" Foreground="White" Width="100"/>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl> 

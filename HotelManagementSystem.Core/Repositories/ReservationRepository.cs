@@ -65,6 +65,19 @@ namespace HotelManagementSystem.Core.Repositories
 
             return overlappingReservations == 0;
         }
+
+        public async Task<IEnumerable<int>> GetBookedRoomIdsAsync(DateTime checkIn, DateTime checkOut, int excludeReservationId = 0)
+        {
+            // Get IDs of rooms that have overlapping reservations for the given date range
+            return await _context.Reservations
+                .Where(r => 
+                    r.Id != excludeReservationId &&
+                    (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.CheckedIn) &&
+                    (r.CheckInDate < checkOut && r.CheckOutDate > checkIn))
+                .Select(r => r.RoomId)
+                .Distinct()
+                .ToListAsync();
+        }
     }
 
     public interface IReservationRepository : IRepository<Reservation>
@@ -74,5 +87,6 @@ namespace HotelManagementSystem.Core.Repositories
         Task<IEnumerable<Reservation>> GetReservationsByDateRangeAsync(DateTime startDate, DateTime endDate);
         Task<IEnumerable<Reservation>> GetReservationsByCustomerAsync(int customerId);
         Task<bool> IsRoomAvailableAsync(int roomId, DateTime checkIn, DateTime checkOut);
+        Task<IEnumerable<int>> GetBookedRoomIdsAsync(DateTime checkIn, DateTime checkOut, int excludeReservationId = 0);
     }
 } 
