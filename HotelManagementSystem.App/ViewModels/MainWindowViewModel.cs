@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using HotelManagementSystem.App.Services;
 using HotelManagementSystem.Core.Data;
 using HotelManagementSystem.Core.Models;
 using HotelManagementSystem.Core.Repositories;
@@ -22,6 +23,7 @@ namespace HotelManagementSystem.App.ViewModels
         private readonly IReservationRepository? _reservationRepository;
         private readonly IRoomRepository? _roomRepository;
         private readonly ICustomerRepository? _customerRepository;
+        private DialogService? _dialogService;
 
         private ObservableCollection<Reservation>? _recentReservations;
         private ObservableCollection<Room>? _rooms;
@@ -106,19 +108,40 @@ namespace HotelManagementSystem.App.ViewModels
         public Room? SelectedRoom
         {
             get => _selectedRoom;
-            set => SetProperty(ref _selectedRoom, value);
+            set
+            {
+                if (SetProperty(ref _selectedRoom, value))
+                {
+                    (EditRoomCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                    (DeleteRoomCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
         
         public Customer? SelectedCustomer
         {
             get => _selectedCustomer;
-            set => SetProperty(ref _selectedCustomer, value);
+            set
+            {
+                if (SetProperty(ref _selectedCustomer, value))
+                {
+                    (EditCustomerCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                    (DeleteCustomerCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
         
         public Reservation? SelectedReservation
         {
             get => _selectedReservation;
-            set => SetProperty(ref _selectedReservation, value);
+            set
+            {
+                if (SetProperty(ref _selectedReservation, value))
+                {
+                    (EditReservationCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                    (DeleteReservationCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                }
+            }
         }
         
         public ViewModelBase? CurrentView
@@ -131,6 +154,12 @@ namespace HotelManagementSystem.App.ViewModels
         {
             get => _isViewingList;
             set => SetProperty(ref _isViewingList, value);
+        }
+        
+        public DialogService? DialogService
+        {
+            get => _dialogService;
+            set => _dialogService = value;
         }
 
         public MainWindowViewModel(DbContextOptions<HotelDbContext> dbOptions)
@@ -370,21 +399,41 @@ namespace HotelManagementSystem.App.ViewModels
         
         private async Task DeleteRoomAsync()
         {
-            if (SelectedRoom == null) return;
+            if (SelectedRoom == null || DialogService == null) return;
+            
+            // Show confirmation dialog
+            var roomNumber = SelectedRoom.RoomNumber;
+            var confirmed = await DialogService.ShowConfirmationAsync(
+                "Delete Room", 
+                $"Are you sure you want to delete room {roomNumber}? This action cannot be undone.");
+            
+            if (!confirmed) return;
             
             using (var context = new HotelDbContext(_dbOptions))
             {
                 var roomRepo = new RoomRepository(context);
+                var reservationRepo = new ReservationRepository(context);
+                
+                // Check if room has any reservations
+                var hasReservations = await reservationRepo.HasReservationsForRoomAsync(SelectedRoom.Id);
+                if (hasReservations)
+                {
+                    await DialogService.ShowConfirmationAsync(
+                        "Cannot Delete Room",
+                        $"Room {roomNumber} has existing reservations and cannot be deleted. Please delete the reservations first.");
+                    return;
+                }
+                
                 var room = await roomRepo.GetByIdAsync(SelectedRoom.Id);
                 if (room != null)
                 {
                     await roomRepo.DeleteAsync(room);
                     await roomRepo.SaveChangesAsync();
+                    
+                    // Refresh rooms list
+                    await LoadRoomsAsync();
                 }
             }
-            
-            // Refresh rooms list
-            await LoadRoomsAsync();
         }
         
         // Customer operations
@@ -439,21 +488,41 @@ namespace HotelManagementSystem.App.ViewModels
         
         private async Task DeleteCustomerAsync()
         {
-            if (SelectedCustomer == null) return;
+            if (SelectedCustomer == null || DialogService == null) return;
+            
+            // Show confirmation dialog
+            var customerName = $"{SelectedCustomer.FirstName} {SelectedCustomer.LastName}";
+            var confirmed = await DialogService.ShowConfirmationAsync(
+                "Delete Customer", 
+                $"Are you sure you want to delete customer {customerName}? This action cannot be undone.");
+            
+            if (!confirmed) return;
             
             using (var context = new HotelDbContext(_dbOptions))
             {
                 var customerRepo = new CustomerRepository(context);
+                var reservationRepo = new ReservationRepository(context);
+                
+                // Check if customer has any reservations
+                var hasReservations = await reservationRepo.HasReservationsForCustomerAsync(SelectedCustomer.Id);
+                if (hasReservations)
+                {
+                    await DialogService.ShowConfirmationAsync(
+                        "Cannot Delete Customer",
+                        $"Customer {customerName} has existing reservations and cannot be deleted. Please delete the reservations first.");
+                    return;
+                }
+                
                 var customer = await customerRepo.GetByIdAsync(SelectedCustomer.Id);
                 if (customer != null)
                 {
                     await customerRepo.DeleteAsync(customer);
                     await customerRepo.SaveChangesAsync();
+                    
+                    // Refresh customers list
+                    await LoadCustomersAsync();
                 }
             }
-            
-            // Refresh customers list
-            await LoadCustomersAsync();
         }
         
         // Reservation operations
@@ -511,7 +580,16 @@ namespace HotelManagementSystem.App.ViewModels
         
         private async Task DeleteReservationAsync()
         {
-            if (SelectedReservation == null) return;
+            if (SelectedReservation == null || DialogService == null) return;
+            
+            // Show confirmation dialog
+            var customerName = SelectedReservation.Customer?.FullName ?? "Unknown";
+            var roomNumber = SelectedReservation.Room?.RoomNumber ?? "Unknown";
+            var confirmed = await DialogService.ShowConfirmationAsync(
+                "Delete Reservation", 
+                $"Are you sure you want to delete the reservation for {customerName} in room {roomNumber}? This action cannot be undone.");
+            
+            if (!confirmed) return;
             
             using (var context = new HotelDbContext(_dbOptions))
             {
@@ -521,13 +599,13 @@ namespace HotelManagementSystem.App.ViewModels
                 {
                     await reservationRepo.DeleteAsync(reservation);
                     await reservationRepo.SaveChangesAsync();
+                    
+                    // Refresh reservations list
+                    await LoadReservationsAsync();
+                    // Also refresh occupancy data as it may have changed
+                    await LoadOccupancyDataAsync();
                 }
             }
-            
-            // Refresh reservations list
-            await LoadReservationsAsync();
-            // Also refresh occupancy data as it may have changed
-            await LoadOccupancyDataAsync();
         }
         
         private void OnFormCancelled()

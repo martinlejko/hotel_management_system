@@ -13,6 +13,10 @@ namespace HotelManagementSystem.App.ViewModels
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
+            
+            // Register for CommandManager's RequerySuggested event to ensure
+            // command state is reevaluated when it should be
+            CommandManager.RequerySuggested += (s, e) => RaiseCanExecuteChanged();
         }
 
         public event EventHandler? CanExecuteChanged;
@@ -26,5 +30,16 @@ namespace HotelManagementSystem.App.ViewModels
         public bool CanExecute(object? parameter) => _canExecute == null || _canExecute(parameter);
 
         public void Execute(object? parameter) => _execute(parameter);
+    }
+    
+    // Simple CommandManager implementation since Avalonia doesn't have one
+    public static class CommandManager
+    {
+        public static event EventHandler? RequerySuggested;
+        
+        public static void InvalidateRequerySuggested()
+        {
+            RequerySuggested?.Invoke(null, EventArgs.Empty);
+        }
     }
 } 
