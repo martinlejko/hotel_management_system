@@ -4,8 +4,137 @@
              xmlns:views="using:HotelManagementSystem.App.Views"
              x:Class="HotelManagementSystem.App.App">
     <Application.Styles>
-        <FluentTheme />
+        <FluentTheme>
+            <FluentTheme.Palettes>
+                <!-- Palette for Light theme variant -->
+                <ColorPaletteResources x:Key="Light" 
+                                       Accent="#2196F3" 
+                                       AltHigh="#FFFFFF"
+                                       AltLow="#FFFFFF"
+                                       AltMedium="#FFFFFF"
+                                       AltMediumHigh="#FFFFFF"
+                                       AltMediumLow="#FFFFFF"
+                                       BaseHigh="#000000"
+                                       BaseLow="#CCCCCC"
+                                       BaseMedium="#898989"
+                                       BaseMediumHigh="#5D5D5D"
+                                       BaseMediumLow="#737373"
+                                       ChromeAltLow="#171717"
+                                       ChromeBlackHigh="#171717"
+                                       ChromeBlackLow="#171717"
+                                       ChromeBlackMedium="#171717"
+                                       ChromeBlackMediumLow="#171717"
+                                       ChromeDisabledHigh="#CCCCCC"
+                                       ChromeDisabledLow="#999999"
+                                       ChromeGray="#808080"
+                                       ChromeHigh="#CCCCCC"
+                                       ChromeLow="#F2F2F2"
+                                       ChromeMedium="#E6E6E6"
+                                       ChromeMediumLow="#F2F2F2"
+                                       ChromeWhite="#FFFFFF"
+                                       ListLow="#E6E6E6"
+                                       ListMedium="#CCCCCC"
+                                       RegionColor="#FFFFFF" />
+                
+                <!-- Palette for Dark theme variant -->
+                <ColorPaletteResources x:Key="Dark" 
+                                       Accent="#2196F3"
+                                       AltHigh="#1B1B1B"
+                                       AltLow="#1B1B1B"
+                                       AltMedium="#1B1B1B"
+                                       AltMediumHigh="#1B1B1B"
+                                       AltMediumLow="#1B1B1B"
+                                       BaseHigh="#FFFFFF"
+                                       BaseLow="#333333"
+                                       BaseMedium="#9A9A9A"
+                                       BaseMediumHigh="#B4B4B4"
+                                       BaseMediumLow="#666666"
+                                       ChromeAltLow="#F2F2F2"
+                                       ChromeBlackHigh="#171717"
+                                       ChromeBlackLow="#171717"
+                                       ChromeBlackMedium="#171717"
+                                       ChromeBlackMediumLow="#171717"
+                                       ChromeDisabledHigh="#333333"
+                                       ChromeDisabledLow="#666666"
+                                       ChromeGray="#808080"
+                                       ChromeHigh="#333333"
+                                       ChromeLow="#232323"
+                                       ChromeMedium="#292929"
+                                       ChromeMediumLow="#262626"
+                                       ChromeWhite="#171717"
+                                       ListLow="#232323"
+                                       ListMedium="#333333"
+                                       RegionColor="#1B1B1B" />
+            </FluentTheme.Palettes>
+        </FluentTheme>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        
+        <!-- Custom styles -->
+        <Style Selector="Button">
+            <Setter Property="Padding" Value="15 10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1976D2"/>
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        <Style Selector="TextBlock.title">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0 10"/>
+            <Setter Property="Foreground" Value="#1565C0"/>
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="8 6"/>
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="8 6"/>
+        </Style>
+        <Style Selector="TabItem">
+            <Setter Property="Padding" Value="15 8"/>
+            <Setter Property="Margin" Value="0 0 2 0"/>
+        </Style>
+        
+        <!-- Further simplified DataGrid styles -->
+        <Style Selector="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#DDDDDD"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#E0E0E0"/>
+        </Style>
+        <Style Selector="DataGridRow">
+            <Setter Property="Background" Value="White"/>
+        </Style>
+        <Style Selector="DataGridCell">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="8 6"/>
+        </Style>
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="#EEF6FF"/>
+            <Setter Property="Foreground" Value="#1565C0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="8 10"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+        <Style Selector="DataGridRow:selected">
+            <Setter Property="Background" Value="#E3F2FD"/>
+        </Style>
+        <Style Selector="DataGridRow:selected DataGridCell">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
     </Application.Styles>
     
     <Application.DataTemplates>
