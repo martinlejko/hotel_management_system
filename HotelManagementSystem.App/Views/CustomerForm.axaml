@@ -3,9 +3,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:HotelManagementSystem.App.ViewModels"
+             xmlns:conv="using:HotelManagementSystem.App.Converters"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="500"
              x:Class="HotelManagementSystem.App.Views.CustomerForm"
              x:DataType="vm:CustomerFormViewModel">
+
+    <UserControl.Resources>
+        <conv:DateTimeOffsetToNullableDateTimeConverter x:Key="DateTimeConverter"/>
+    </UserControl.Resources>
 
     <ScrollViewer>
         <Grid RowDefinitions="*,Auto" Margin="20">
@@ -28,7 +33,7 @@
                 <TextBox Text="{Binding Address}" Height="60" TextWrapping="Wrap" AcceptsReturn="True"/>
                 
                 <TextBlock Text="Date of Birth:"/>
-                <DatePicker SelectedDate="{Binding DateOfBirth}"/>
+                <DatePicker SelectedDate="{Binding DateOfBirth, Converter={StaticResource DateTimeConverter}}"/>
             </StackPanel>
             
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">

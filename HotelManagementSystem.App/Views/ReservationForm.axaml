@@ -4,9 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:HotelManagementSystem.App.ViewModels"
              xmlns:models="using:HotelManagementSystem.Core.Models"
+             xmlns:conv="using:HotelManagementSystem.App.Converters"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
              x:Class="HotelManagementSystem.App.Views.ReservationForm"
              x:DataType="vm:ReservationFormViewModel">
+
+    <UserControl.Resources>
+        <conv:DateTimeOffsetToDateTimeConverter x:Key="DateTimeConverter"/>
+    </UserControl.Resources>
 
     <ScrollViewer>
         <Grid RowDefinitions="*,Auto" Margin="20">
@@ -32,16 +37,19 @@
                 </ComboBox>
                 
                 <TextBlock Text="Check-in Date:"/>
-                <DatePicker SelectedDate="{Binding CheckInDate}"/>
+                <DatePicker SelectedDate="{Binding CheckInDate, Converter={StaticResource DateTimeConverter}}"/>
                 
                 <TextBlock Text="Check-out Date:"/>
-                <DatePicker SelectedDate="{Binding CheckOutDate}"/>
+                <DatePicker SelectedDate="{Binding CheckOutDate, Converter={StaticResource DateTimeConverter}}"/>
                 
                 <TextBlock Text="Status:"/>
                 <ComboBox SelectedItem="{Binding SelectedStatus}" ItemsSource="{Binding ReservationStatuses}" HorizontalAlignment="Stretch"/>
                 
                 <TextBlock Text="Total Price:"/>
-                <TextBox Text="{Binding TotalPrice}" IsReadOnly="True"/>
+                <Grid ColumnDefinitions="Auto,*">
+                    <TextBlock Grid.Column="0" Text="$" VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1" Text="{Binding TotalPrice}" IsReadOnly="True" Margin="5,0,0,0"/>
+                </Grid>
                 
                 <TextBlock Text="Special Requests:"/>
                 <TextBox Text="{Binding SpecialRequests}" Height="80" TextWrapping="Wrap" AcceptsReturn="True"/>
