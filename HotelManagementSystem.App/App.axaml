@@ -95,6 +95,13 @@
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="Background" Value="White"/>
         </Style>
+        
+        <!-- Style for invalid input -->
+        <Style Selector="TextBox.invalid">
+            <Setter Property="BorderBrush" Value="#E53935"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        
         <Style Selector="ComboBox">
             <Setter Property="CornerRadius" Value="4"/>
             <Setter Property="Padding" Value="8 6"/>

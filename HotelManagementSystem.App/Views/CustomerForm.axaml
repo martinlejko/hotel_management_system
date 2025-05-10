@@ -18,16 +18,20 @@
                 <TextBlock Text="Customer Details" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
                 
                 <TextBlock Text="First Name:"/>
-                <TextBox Text="{Binding FirstName}" Watermark="Enter first name"/>
+                <TextBox x:Name="FirstNameTextBox" Text="{Binding FirstName}" Watermark="Enter first name"/>
+                <TextBlock x:Name="FirstNameErrorText" Foreground="#E53935" FontSize="12" Margin="0,2,0,5"/>
                 
                 <TextBlock Text="Last Name:"/>
-                <TextBox Text="{Binding LastName}" Watermark="Enter last name"/>
+                <TextBox x:Name="LastNameTextBox" Text="{Binding LastName}" Watermark="Enter last name"/>
+                <TextBlock x:Name="LastNameErrorText" Foreground="#E53935" FontSize="12" Margin="0,2,0,5"/>
                 
                 <TextBlock Text="Email:"/>
-                <TextBox Text="{Binding Email}" Watermark="Enter email address"/>
+                <TextBox x:Name="EmailTextBox" Text="{Binding Email}" Watermark="Enter email address"/>
+                <TextBlock x:Name="EmailErrorText" Foreground="#E53935" FontSize="12" Margin="0,2,0,5"/>
                 
                 <TextBlock Text="Phone Number:"/>
-                <TextBox Text="{Binding PhoneNumber}" Watermark="Enter phone number"/>
+                <TextBox x:Name="PhoneTextBox" Text="{Binding PhoneNumber}" Watermark="Enter phone number"/>
+                <TextBlock x:Name="PhoneErrorText" Foreground="#E53935" FontSize="12" Margin="0,2,0,5"/>
                 
                 <TextBlock Text="Address:"/>
                 <TextBox Text="{Binding Address}" Height="60" TextWrapping="Wrap" AcceptsReturn="True"/>
@@ -38,7 +42,7 @@
             
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
                 <Button Content="Cancel" Command="{Binding CancelCommand}" Width="100"/>
-                <Button Content="Save" Command="{Binding SaveCommand}" Background="#2196F3" Foreground="White" Width="100"/>
+                <Button x:Name="SaveButton" Content="Save" Command="{Binding SaveCommand}" Background="#2196F3" Foreground="White" Width="100"/>
             </StackPanel>
         </Grid>
     </ScrollViewer>
