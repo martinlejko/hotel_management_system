@@ -39,11 +39,11 @@
                 <!-- Palette for Dark theme variant -->
                 <ColorPaletteResources x:Key="Dark" 
                                        Accent="#2196F3"
-                                       AltHigh="#1B1B1B"
-                                       AltLow="#1B1B1B"
-                                       AltMedium="#1B1B1B"
-                                       AltMediumHigh="#1B1B1B"
-                                       AltMediumLow="#1B1B1B"
+                                       AltHigh="#91d1ff"
+                                       AltLow="#91d1ff"
+                                       AltMedium="#91d1ff"
+                                       AltMediumHigh="#91d1ff"
+                                       AltMediumLow="#91d1ff"
                                        BaseHigh="#FFFFFF"
                                        BaseLow="#333333"
                                        BaseMedium="#9A9A9A"
@@ -58,13 +58,13 @@
                                        ChromeDisabledLow="#666666"
                                        ChromeGray="#808080"
                                        ChromeHigh="#333333"
-                                       ChromeLow="#232323"
+                                       ChromeLow="#91d1ff"
                                        ChromeMedium="#292929"
                                        ChromeMediumLow="#262626"
                                        ChromeWhite="#171717"
-                                       ListLow="#232323"
+                                       ListLow="#91d1ff"
                                        ListMedium="#333333"
-                                       RegionColor="#1B1B1B" />
+                                       RegionColor="#91d1ff" />
             </FluentTheme.Palettes>
         </FluentTheme>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
@@ -92,6 +92,8 @@
         <Style Selector="TextBox">
             <Setter Property="CornerRadius" Value="4"/>
             <Setter Property="Padding" Value="8 6"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Background" Value="White"/>
         </Style>
         <Style Selector="ComboBox">
             <Setter Property="CornerRadius" Value="4"/>
@@ -119,13 +121,13 @@
         
         <!-- Selected row style -->
         <Style Selector="DataGridRow:selected">
-            <Setter Property="Background" Value="#91d1ff"/>
-            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Background" Value="#1E88E5"/>
+            <Setter Property="Foreground" Value="White"/>
         </Style>
         
         <!-- Row hover style - targeting the background rectangle template part -->
         <Style Selector="DataGridRow:pointerover">
-            <Setter Property="Background" Value="#91d1ff"/>
+            <Setter Property="Background" Value="#64B5F6"/>
             <Setter Property="Foreground" Value="Black"/>
         </Style>
         
@@ -136,13 +138,13 @@
             <Setter Property="Padding" Value="8 6"/>
         </Style>
         
-        <!-- Selected cells should have black text -->
+        <!-- Selected cells should have white text for better contrast -->
         <Style Selector="DataGridCell:selected">
-            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Foreground" Value="White"/>
             <Setter Property="Background" Value="Transparent"/>
         </Style>
         
-        <!-- Cells on hover should have black text -->
+        <!-- Cells on hover should still have black text -->
         <Style Selector="DataGridRow:pointerover DataGridCell">
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -158,15 +160,23 @@
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
         </Style>
         
-        <!-- Internal template styling for hover and selection -->
+        <!-- Internal template styling for hover - using a darker shade of blue -->
         <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="#91d1ff"/>
+            <Setter Property="Fill" Value="#64B5F6"/>
             <Setter Property="Opacity" Value="1"/>
         </Style>
         
+        <!-- Internal template styling for selection - using a darker blue for better aesthetics -->
         <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="#91d1ff"/>
+            <Setter Property="Fill" Value="#1E88E5"/>
             <Setter Property="Opacity" Value="1"/>
+        </Style>
+        
+        <!-- Search TextBox specific styling -->
+        <Style Selector="TextBox.search">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#BBDEFB"/>
         </Style>
     </Application.Styles>
     
