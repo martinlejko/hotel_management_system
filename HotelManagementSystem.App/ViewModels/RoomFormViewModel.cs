@@ -41,7 +41,9 @@ namespace HotelManagementSystem.App.ViewModels
             get => _capacity;
             set 
             { 
-                if (SetProperty(ref _capacity, value))
+                // Ensure capacity is never less than 1
+                int validValue = value < 1 ? 1 : value;
+                if (SetProperty(ref _capacity, validValue))
                 {
                     (SaveCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 }
@@ -86,7 +88,7 @@ namespace HotelManagementSystem.App.ViewModels
             {
                 RoomNumber = room.RoomNumber;
                 SelectedRoomType = room.Type;
-                Capacity = room.Capacity;
+                Capacity = room.Capacity < 1 ? 1 : room.Capacity; // Ensure capacity is at least 1
                 PricePerNight = room.PricePerNight;
                 Description = room.Description;
                 IsAvailable = room.IsAvailable;
@@ -98,13 +100,13 @@ namespace HotelManagementSystem.App.ViewModels
         
         private bool CanSave()
         {
-            return !string.IsNullOrWhiteSpace(RoomNumber) && Capacity > 0 && PricePerNight >= 0;
+            return !string.IsNullOrWhiteSpace(RoomNumber) && Capacity >= 1 && PricePerNight >= 0;
         }
         
         private void Save()
         {
             // Validate input
-            if (string.IsNullOrWhiteSpace(RoomNumber))
+            if (string.IsNullOrWhiteSpace(RoomNumber) || Capacity < 1)
             {
                 // In a real app, show an error message
                 return;

@@ -3,9 +3,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:HotelManagementSystem.App.ViewModels"
+             xmlns:conv="using:HotelManagementSystem.App.Converters"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
              x:Class="HotelManagementSystem.App.Views.RoomForm"
              x:DataType="vm:RoomFormViewModel">
+
+    <UserControl.Resources>
+        <conv:IntToNonNullableIntConverter x:Key="IntConverter"/>
+    </UserControl.Resources>
 
     <ScrollViewer>
         <Grid RowDefinitions="*,Auto" Margin="20">
@@ -19,10 +24,16 @@
                 <ComboBox SelectedItem="{Binding SelectedRoomType}" ItemsSource="{Binding RoomTypes}" HorizontalAlignment="Stretch"/>
                 
                 <TextBlock Text="Capacity:"/>
-                <NumericUpDown Value="{Binding Capacity}" Minimum="1" Maximum="10" Increment="1"/>
+                <NumericUpDown Value="{Binding Capacity, Converter={StaticResource IntConverter}, ConverterParameter=1}" 
+                               Minimum="1" 
+                               Maximum="10" 
+                               Increment="1"
+                               FormatString="0"
+                               ClipValueToMinMax="True"
+                               ShowButtonSpinner="True"/>
                 
                 <TextBlock Text="Price per Night:"/>
-                <NumericUpDown Value="{Binding PricePerNight}" Minimum="0" Increment="10"/>
+                <NumericUpDown Value="{Binding PricePerNight}" Minimum="0" Increment="10" FormatString="C0"/>
                 
                 <TextBlock Text="Description:"/>
                 <TextBox Text="{Binding Description}" Height="60" TextWrapping="Wrap" AcceptsReturn="True"/>
