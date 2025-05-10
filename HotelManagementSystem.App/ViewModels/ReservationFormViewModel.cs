@@ -290,9 +290,13 @@ namespace HotelManagementSystem.App.ViewModels
             reservation.TotalPrice = TotalPrice;
             reservation.SpecialRequests = SpecialRequests;
             
-            // Set navigation properties for display
-            reservation.Customer = SelectedCustomer;
-            reservation.Room = SelectedRoom;
+            // Only set navigation properties when updating an existing reservation
+            // This prevents EF Core from trying to add a new customer or room when saving
+            if (_originalReservation != null)
+            {
+                reservation.Customer = SelectedCustomer;
+                reservation.Room = SelectedRoom;
+            }
             
             // Notify that save is completed
             SaveCompleted?.Invoke(reservation);
