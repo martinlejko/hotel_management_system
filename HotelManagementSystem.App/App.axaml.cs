@@ -7,6 +7,7 @@ using HotelManagementSystem.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace HotelManagementSystem.App
 {
@@ -31,10 +32,7 @@ namespace HotelManagementSystem.App
                     .Options;
 
                 // Create and seed the database if it doesn't exist
-                using (var db = new HotelDbContext(options))
-                {
-                    db.Database.EnsureCreated();
-                }
+                InitializeDatabase(options);
 
                 // Create main window
                 var mainWindow = new MainWindow();
@@ -49,6 +47,15 @@ namespace HotelManagementSystem.App
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private async void InitializeDatabase(DbContextOptions<HotelDbContext> options)
+        {
+            using (var db = new HotelDbContext(options))
+            {
+                var seeder = new DataSeeder(db);
+                await seeder.SeedAsync();
+            }
         }
     }
 } 

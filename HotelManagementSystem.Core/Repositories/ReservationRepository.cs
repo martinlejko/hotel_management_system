@@ -78,6 +78,18 @@ namespace HotelManagementSystem.Core.Repositories
                 .Distinct()
                 .ToListAsync();
         }
+        
+        public async Task<bool> HasReservationsForRoomAsync(int roomId)
+        {
+            return await _context.Reservations
+                .AnyAsync(r => r.RoomId == roomId);
+        }
+        
+        public async Task<bool> HasReservationsForCustomerAsync(int customerId)
+        {
+            return await _context.Reservations
+                .AnyAsync(r => r.CustomerId == customerId);
+        }
     }
 
     public interface IReservationRepository : IRepository<Reservation>
@@ -88,5 +100,7 @@ namespace HotelManagementSystem.Core.Repositories
         Task<IEnumerable<Reservation>> GetReservationsByCustomerAsync(int customerId);
         Task<bool> IsRoomAvailableAsync(int roomId, DateTime checkIn, DateTime checkOut);
         Task<IEnumerable<int>> GetBookedRoomIdsAsync(DateTime checkIn, DateTime checkOut, int excludeReservationId = 0);
+        Task<bool> HasReservationsForRoomAsync(int roomId);
+        Task<bool> HasReservationsForCustomerAsync(int customerId);
     }
 } 
