@@ -78,7 +78,6 @@ namespace HotelManagementSystem.App.ViewModels
         {
             _originalCustomer = customer;
             
-            // If editing an existing customer, populate the fields
             if (customer != null)
             {
                 FirstName = customer.FirstName;
@@ -102,14 +101,11 @@ namespace HotelManagementSystem.App.ViewModels
         
         private void Save()
         {
-            // Validate input
             if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Email))
             {
-                // In a real app, show an error message
                 return;
             }
             
-            // Create or update the customer
             Customer customer = _originalCustomer ?? new Customer();
             customer.FirstName = FirstName;
             customer.LastName = LastName;
@@ -123,7 +119,6 @@ namespace HotelManagementSystem.App.ViewModels
                 customer.CreatedAt = DateTime.Now;
             }
             
-            // Notify that save is completed
             SaveCompleted?.Invoke(customer);
         }
         

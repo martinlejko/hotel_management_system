@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using HotelManagementSystem.App.Services;
 using HotelManagementSystem.Core.Data;
 using HotelManagementSystem.Core.Models;
 using HotelManagementSystem.Core.Repositories;
@@ -23,7 +22,6 @@ namespace HotelManagementSystem.App.ViewModels
         private readonly IReservationRepository? _reservationRepository;
         private readonly IRoomRepository? _roomRepository;
         private readonly ICustomerRepository? _customerRepository;
-        private DialogService? _dialogService;
 
         private ObservableCollection<Reservation>? _recentReservations;
         private ObservableCollection<Room>? _rooms;
@@ -38,13 +36,11 @@ namespace HotelManagementSystem.App.ViewModels
         private ViewModelBase? _currentView;
         private bool _isViewingList = true;
         
-        // Delete confirmation
         private bool _isConfirmingDelete;
         private string _deleteConfirmationTitle = string.Empty;
         private string _deleteConfirmationMessage = string.Empty;
         private DeleteItemType _deleteItemType;
         
-        // Command properties
         public ICommand AddRoomCommand { get; }
         public ICommand EditRoomCommand { get; }
         public ICommand DeleteRoomCommand { get; }
@@ -59,7 +55,6 @@ namespace HotelManagementSystem.App.ViewModels
         public ICommand ConfirmDeleteCommand { get; }
         public ICommand CancelDeleteCommand { get; }
         
-        // Delete item type enum
         private enum DeleteItemType
         {
             None,
@@ -171,12 +166,6 @@ namespace HotelManagementSystem.App.ViewModels
         {
             get => _isViewingList;
             set => SetProperty(ref _isViewingList, value);
-        }
-        
-        public DialogService? DialogService
-        {
-            get => _dialogService;
-            set => _dialogService = value;
         }
         
         public bool IsConfirmingDelete

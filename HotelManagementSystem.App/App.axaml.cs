@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using HotelManagementSystem.App.Services;
 using HotelManagementSystem.App.ViewModels;
 using HotelManagementSystem.App.Views;
 using HotelManagementSystem.Core.Data;
@@ -42,9 +41,6 @@ namespace HotelManagementSystem.App
                 
                 // Create view model
                 var viewModel = new MainWindowViewModel(options);
-                
-                // Initialize dialog service
-                viewModel.DialogService = new DialogService(mainWindow);
                 
                 // Set data context
                 mainWindow.DataContext = viewModel;
