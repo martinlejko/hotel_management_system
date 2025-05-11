@@ -40,39 +40,6 @@ namespace HotelManagementSystem.Core.Validation
         }
         
         /// <summary>
-        /// Validates if a string meets a minimum length requirement
-        /// </summary>
-        public static bool HasMinimumLength(string? value, int minLength)
-        {
-            if (string.IsNullOrEmpty(value))
-                return false;
-                
-            return value.Length >= minLength;
-        }
-        
-        /// <summary>
-        /// Validates if a string does not exceed a maximum length
-        /// </summary>
-        public static bool HasMaximumLength(string? value, int maxLength)
-        {
-            if (string.IsNullOrEmpty(value))
-                return true; // Empty strings are valid for max length check
-                
-            return value.Length <= maxLength;
-        }
-        
-        /// <summary>
-        /// Validates if a string contains only letters
-        /// </summary>
-        public static bool ContainsOnlyLetters(string? value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return false;
-                
-            return value.All(char.IsLetter);
-        }
-        
-        /// <summary>
         /// Validates if a string contains only digits
         /// </summary>
         public static bool ContainsOnlyDigits(string? value)

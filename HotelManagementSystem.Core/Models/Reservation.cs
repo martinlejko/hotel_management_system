@@ -29,18 +29,15 @@ namespace HotelManagementSystem.Core.Models
         [MaxLength(500)]
         public string? SpecialRequests { get; set; }
 
-        // Navigation properties
         public virtual Customer? Customer { get; set; }
         public virtual Room? Room { get; set; }
 
-        // Helper properties
         [NotMapped]
         public int DurationInDays => (CheckOutDate - CheckInDate).Days;
 
         [NotMapped]
         public bool IsActive => Status == ReservationStatus.Confirmed || Status == ReservationStatus.CheckedIn;
 
-        // Helper method to calculate total price
         public void CalculateTotalPrice()
         {
             if (Room != null && DurationInDays > 0)

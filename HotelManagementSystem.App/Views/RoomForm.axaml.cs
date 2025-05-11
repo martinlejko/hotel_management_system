@@ -44,15 +44,6 @@ namespace HotelManagementSystem.App.Views
             // Set up price validation
             if (_priceTextBox != null)
             {
-                // Initialize with a valid value and prevent nulls
-                if (_priceTextBox.Value == null)
-                {
-                    _priceTextBox.Value = 0;
-                }
-                
-                // Ensure the price always has the currency format
-                _priceTextBox.FormatString = "C0"; // "C0" is currency with 0 decimal places
-                
                 // Single handler for ValueChanged that handles null values and performs validation
                 _priceTextBox.ValueChanged += (s, e) => 
                 {
@@ -70,12 +61,6 @@ namespace HotelManagementSystem.App.Views
             // Set up capacity validation
             if (_capacityTextBox != null)
             {
-                // Initialize with a valid value 
-                if (_capacityTextBox.Value == null)
-                {
-                    _capacityTextBox.Value = 1;
-                }
-                
                 // Single handler for ValueChanged that handles null values and performs validation
                 _capacityTextBox.ValueChanged += (s, e) => 
                 {
@@ -201,8 +186,8 @@ namespace HotelManagementSystem.App.Views
         {
             if (_priceTextBox == null) return;
             
-            // Ensure the currency format is always applied
-            _priceTextBox.FormatString = "C0";
+            // This is redundant as format string is already set in XAML
+            // _priceTextBox.FormatString = "C0";
         }
         
         private void UpdateSaveButtonState()

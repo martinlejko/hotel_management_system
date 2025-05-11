@@ -48,25 +48,21 @@ namespace HotelManagementSystem.App.Views
             if (_emailTextBox != null)
             {
                 _emailTextBox.TextChanged += (s, e) => ValidateEmail();
-                _emailTextBox.LostFocus += (s, e) => ValidateEmail();
             }
             
             if (_phoneTextBox != null)
             {
                 _phoneTextBox.TextChanged += (s, e) => ValidatePhone();
-                _phoneTextBox.LostFocus += (s, e) => ValidatePhone();
             }
             
             if (_firstNameTextBox != null)
             {
                 _firstNameTextBox.TextChanged += (s, e) => ValidateFirstName();
-                _firstNameTextBox.LostFocus += (s, e) => ValidateFirstName();
             }
             
             if (_lastNameTextBox != null)
             {
                 _lastNameTextBox.TextChanged += (s, e) => ValidateLastName();
-                _lastNameTextBox.LostFocus += (s, e) => ValidateLastName();
             }
             
             // Perform initial validation

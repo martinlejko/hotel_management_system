@@ -39,7 +39,7 @@ namespace HotelManagementSystem.Core.Repositories
             var roomsWithOverlappingReservations = await _context.Reservations
                 .Where(r => 
                     (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.CheckedIn) &&
-                    ((r.CheckInDate <= checkOut && r.CheckOutDate >= checkIn)))
+                    r.CheckInDate <= checkOut && r.CheckOutDate >= checkIn)
                 .Select(r => r.RoomId)
                 .Distinct()
                 .ToListAsync();
@@ -47,12 +47,5 @@ namespace HotelManagementSystem.Core.Repositories
             // Return rooms that don't have overlapping reservations
             return allRooms.Where(r => !roomsWithOverlappingReservations.Contains(r.Id));
         }
-    }
-
-    public interface IRoomRepository : IRepository<Room>
-    {
-        Task<IEnumerable<Room>> GetRoomsWithReservationsAsync();
-        Task<Room?> GetRoomWithReservationsAsync(int roomId);
-        Task<IEnumerable<Room>> GetAvailableRoomsAsync(DateTime checkIn, DateTime checkOut);
     }
 } 

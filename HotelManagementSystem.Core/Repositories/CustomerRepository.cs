@@ -28,10 +28,4 @@ namespace HotelManagementSystem.Core.Repositories
                 .FirstOrDefaultAsync(c => c.Id == customerId);
         }
     }
-
-    public interface ICustomerRepository : IRepository<Customer>
-    {
-        Task<IEnumerable<Customer>> GetCustomersWithReservationsAsync();
-        Task<Customer?> GetCustomerWithReservationsAsync(int customerId);
-    }
 } 

@@ -73,7 +73,7 @@ namespace HotelManagementSystem.Core.Repositories
                 .Where(r => 
                     r.Id != excludeReservationId &&
                     (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.CheckedIn) &&
-                    (r.CheckInDate < checkOut && r.CheckOutDate > checkIn))
+                    r.CheckInDate < checkOut && r.CheckOutDate > checkIn)
                 .Select(r => r.RoomId)
                 .Distinct()
                 .ToListAsync();
@@ -90,17 +90,5 @@ namespace HotelManagementSystem.Core.Repositories
             return await _context.Reservations
                 .AnyAsync(r => r.CustomerId == customerId);
         }
-    }
-
-    public interface IReservationRepository : IRepository<Reservation>
-    {
-        Task<IEnumerable<Reservation>> GetAllReservationsWithDetailsAsync();
-        Task<Reservation?> GetReservationWithDetailsAsync(int reservationId);
-        Task<IEnumerable<Reservation>> GetReservationsByDateRangeAsync(DateTime startDate, DateTime endDate);
-        Task<IEnumerable<Reservation>> GetReservationsByCustomerAsync(int customerId);
-        Task<bool> IsRoomAvailableAsync(int roomId, DateTime checkIn, DateTime checkOut);
-        Task<IEnumerable<int>> GetBookedRoomIdsAsync(DateTime checkIn, DateTime checkOut, int excludeReservationId = 0);
-        Task<bool> HasReservationsForRoomAsync(int roomId);
-        Task<bool> HasReservationsForCustomerAsync(int customerId);
     }
 } 

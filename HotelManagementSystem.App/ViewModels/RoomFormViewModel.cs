@@ -100,15 +100,17 @@ namespace HotelManagementSystem.App.ViewModels
         
         private bool CanSave()
         {
+            // The detailed validation is already handled in the View,
+            // so we only need basic checks here
             return !string.IsNullOrWhiteSpace(RoomNumber) && Capacity >= 1 && PricePerNight >= 0;
         }
         
         private void Save()
         {
-            // Validate input
+            // The Save button should be disabled when validation fails,
+            // so this check shouldn't be necessary, but kept for safety
             if (string.IsNullOrWhiteSpace(RoomNumber) || Capacity < 1)
             {
-                // In a real app, show an error message
                 return;
             }
             

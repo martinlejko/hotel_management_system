@@ -31,10 +31,8 @@ namespace HotelManagementSystem.Core.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Navigation property - one customer can have many reservations
         public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
-        // Helper property to get full name
         public string FullName => $"{FirstName} {LastName}";
     }
 } 
