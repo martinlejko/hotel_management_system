@@ -57,12 +57,11 @@ A cross-platform desktop application for hotel management built with C# and Aval
    dotnet run --project HotelManagementSystem.App
    ```
 ### 🗄️ Database Information
+The application uses SQLite for data storage. The database file is automatically created in the application's directory:
 
-The application uses SQLite for data storage. The database file is automatically created in your local application data folder:
-
-- **🪟 Windows**: `%LOCALAPPDATA%\HotelManagementSystem.db`
-- **🍎 macOS**: `~/Library/Application Support/HotelManagementSystem.db`
-- **🐧 Linux**: `~/.local/share/HotelManagementSystem.db`
+- The database file is stored in a `Data` folder within the application's base directory
+- Path: `[Application Directory]/Data/HotelManagementSystem.db`
+- This location is consistent across all platforms (Windows, macOS, and Linux)
 
 The database is automatically seeded with sample data on first run, including:
 - 🛏️ Hotel rooms of different types (Standard, Deluxe, Suite)

@@ -22,13 +22,7 @@ namespace HotelManagementSystem.App
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                string dbPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "HotelManagementSystem.db");
-
-                var options = new DbContextOptionsBuilder<HotelDbContext>()
-                    .UseSqlite($"Data Source={dbPath}")
-                    .Options;
+                var options = CreateDatabaseOptions();
 
                 InitializeDatabase(options);
 
@@ -51,6 +45,26 @@ namespace HotelManagementSystem.App
                 var seeder = new DataSeeder(db);
                 await seeder.SeedAsync();
             }
+        }
+
+        private DbContextOptions<HotelDbContext> CreateDatabaseOptions()
+        {
+            string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string dataDirectory = Path.Combine(appDirectory, "Data");
+            
+            if (!Directory.Exists(dataDirectory))
+            {
+                Directory.CreateDirectory(dataDirectory);
+            }
+            
+            string dbPath = Path.Combine(dataDirectory, "HotelManagementSystem.db");
+            Console.WriteLine($"Database path: {dbPath}");
+
+            var options = new DbContextOptionsBuilder<HotelDbContext>()
+            .UseSqlite($"Data Source={dbPath}")
+            .Options;
+
+            return options;
         }
     }
 } 

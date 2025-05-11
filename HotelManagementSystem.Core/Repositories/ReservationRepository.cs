@@ -36,27 +36,6 @@ namespace HotelManagementSystem.Core.Repositories
                 .ToListAsync();
         }
 
-        // public async Task<IEnumerable<Reservation>> GetReservationsByCustomerAsync(int customerId)
-        // {
-        //     return await _context.Reservations
-        //         .Include(r => r.Room)
-        //         .Where(r => r.CustomerId == customerId)
-        //         .OrderByDescending(r => r.CheckInDate)
-        //         .ToListAsync();
-        // }
-
-        // public async Task<bool> IsRoomAvailableAsync(int roomId, DateTime checkIn, DateTime checkOut)
-        // {
-        //     var overlappingReservations = await _context.Reservations
-        //         .Where(r => 
-        //             r.RoomId == roomId && 
-        //             (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.CheckedIn) &&
-        //             r.CheckInDate <= checkOut && r.CheckOutDate >= checkIn)
-        //         .CountAsync();
-
-        //     return overlappingReservations == 0;
-        // }
-
         public async Task<IEnumerable<int>> GetBookedRoomIdsAsync(DateTime checkIn, DateTime checkOut, int excludeReservationId = 0)
         {
             return await _context.Reservations
