@@ -22,7 +22,6 @@ namespace HotelManagementSystem.App
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                // Set up the database
                 string dbPath = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "HotelManagementSystem.db");
@@ -31,16 +30,12 @@ namespace HotelManagementSystem.App
                     .UseSqlite($"Data Source={dbPath}")
                     .Options;
 
-                // Create and seed the database if it doesn't exist
                 InitializeDatabase(options);
 
-                // Create main window
                 var mainWindow = new MainWindow();
                 
-                // Create view model
                 var viewModel = new MainWindowViewModel(options);
                 
-                // Set data context
                 mainWindow.DataContext = viewModel;
                 
                 desktop.MainWindow = mainWindow;

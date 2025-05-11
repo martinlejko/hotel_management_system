@@ -8,24 +8,22 @@ namespace HotelManagementSystem.App.Converters
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            // Converting from DateTime to DateTimeOffset for the UI
             if (value is DateTime dateTime)
             {
                 return new DateTimeOffset(dateTime);
             }
             
-            return DateTimeOffset.Now; // Default value
+            return DateTimeOffset.Now;
         }
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            // Converting from DateTimeOffset to DateTime when saving
             if (value is DateTimeOffset dateTimeOffset)
             {
                 return dateTimeOffset.DateTime;
             }
             
-            return DateTime.Now; // Default value
+            return DateTime.Now;
         }
     }
 } 
