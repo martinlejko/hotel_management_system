@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using HotelManagementSystem.Core.Validation;
 using System;
 
@@ -56,7 +57,28 @@ namespace HotelManagementSystem.App.Views
             // Set up capacity validation
             if (_capacityTextBox != null)
             {
-                _capacityTextBox.ValueChanged += (s, e) => ValidateCapacity();
+                // Initialize with a valid value and prevent nulls
+                if (_capacityTextBox.Value == null)
+                {
+                    _capacityTextBox.Value = 1;
+                }
+                
+                // Handle direct text input to prevent nulls
+                _capacityTextBox.KeyDown += (s, e) =>
+                {
+                    // Do this on a slight delay to let the control update first
+                    Dispatcher.UIThread.Post(EnsureValidCapacity, DispatcherPriority.Background);
+                };
+                
+                _capacityTextBox.ValueChanged += (s, e) => 
+                {
+                    // If value becomes null during editing, reset to 1
+                    if (_capacityTextBox.Value == null)
+                    {
+                        _capacityTextBox.Value = 1;
+                    }
+                    ValidateCapacity();
+                };
                 _capacityTextBox.LostFocus += (s, e) => ValidateCapacity();
             }
             
@@ -133,7 +155,9 @@ namespace HotelManagementSystem.App.Views
         {
             if (_capacityTextBox == null || _capacityErrorText == null) return;
             
-            int capacity = (int)(_capacityTextBox.Value ?? 1);
+            // Safely handle null value
+            decimal? rawValue = _capacityTextBox.Value;
+            int capacity = rawValue.HasValue ? (int)rawValue.Value : 0;
             
             // Capacity should be at least 1
             bool isValid = capacity >= 1;
@@ -152,6 +176,12 @@ namespace HotelManagementSystem.App.Views
                 string errorMessage = "Capacity must be at least 1";
                 ToolTip.SetTip(_capacityTextBox, errorMessage);
                 _capacityErrorText.Text = errorMessage;
+                
+                // Reset to minimum value if invalid
+                if (!rawValue.HasValue)
+                {
+                    _capacityTextBox.Value = 1;
+                }
             }
             
             UpdateSaveButtonState();
@@ -179,6 +209,14 @@ namespace HotelManagementSystem.App.Views
             else
             {
                 ToolTip.SetTip(_saveButton, null);
+            }
+        }
+        
+        private void EnsureValidCapacity()
+        {
+            if (_capacityTextBox != null && _capacityTextBox.Value == null)
+            {
+                _capacityTextBox.Value = 1;
             }
         }
     }

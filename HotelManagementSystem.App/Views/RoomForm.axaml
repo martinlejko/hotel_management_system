@@ -32,7 +32,9 @@
                                Increment="1"
                                FormatString="0"
                                ClipValueToMinMax="True"
-                               ShowButtonSpinner="True"/>
+                               AllowSpin="True"
+                               ShowButtonSpinner="True"
+                               IsReadOnly="False"/>
                 <TextBlock x:Name="CapacityErrorText" Foreground="#E53935" FontSize="12" Margin="0,2,0,5"/>
                 
                 <TextBlock Text="Price per Night:"/>
