@@ -63,16 +63,87 @@
                                Padding="15">
                             <StackPanel>
                                 <TextBlock Text="Current Occupancy" Classes="title"/>
-                                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Occupancy Rate:" Margin="0 5" Foreground="Black"/>
-                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding OccupancyRate}" Margin="10 5" FontWeight="Bold" Foreground="Black"/>
+                                
+                                <!-- Custom Pie Chart - Reduced Size -->
+                                <Grid Height="140" Width="140" Margin="0,10,0,5" HorizontalAlignment="Center">
+                                    <!-- Canvas for the pie chart -->
+                                    <Canvas Width="120" Height="120" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- First pie slice (blue - occupied) -->
+                                        <Path Fill="#2196F3" Stroke="#FFFFFF" StrokeThickness="1">
+                                            <Path.Data>
+                                                <PathGeometry>
+                                                    <PathFigure StartPoint="60,60" IsClosed="True">
+                                                        <!-- Start at center -->
+                                                        <LineSegment Point="60,0" />
+                                                        <!-- Line to top (12 o'clock position) -->
+                                                        <ArcSegment
+                                                            Size="60,60"
+                                                            Point="{Binding OccupancyEndPoint}"
+                                                            SweepDirection="Clockwise"
+                                                            IsLargeArc="{Binding IsLargeArc}" />
+                                                    </PathFigure>
+                                                </PathGeometry>
+                                            </Path.Data>
+                                        </Path>
+
+                                        <!-- Second pie slice (color changed for vacant) -->
+                                        <Path Fill="#8e44ad" Stroke="#FFFFFF" StrokeThickness="1">
+                                            <Path.Data>
+                                                <PathGeometry>
+                                                    <PathFigure StartPoint="60,60" IsClosed="True">
+                                                        <!-- Start at center -->
+                                                        <LineSegment Point="{Binding OccupancyEndPoint}" />
+                                                        <!-- Line to where first slice ends -->
+                                                        <ArcSegment
+                                                            Size="60,60" 
+                                                            Point="60,0" 
+                                                            SweepDirection="Clockwise"
+                                                            IsLargeArc="{Binding IsSmallArc}" />
+                                                    </PathFigure>
+                                                </PathGeometry>
+                                            </Path.Data>
+                                        </Path>
+                                    </Canvas>
                                     
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Today's Date:" Margin="0 5" Foreground="Black"/>
-                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedDate}" Margin="10 5" Foreground="Black"/>
-                                    
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Total Rooms:" Margin="0 5" Foreground="Black"/>
-                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Rooms.Count}" Margin="10 5" Foreground="Black"/>
+                                    <!-- Percentage display in center -->
+                                    <Border Background="#FFFFFF" 
+                                            Width="50" Height="50" 
+                                            CornerRadius="25"
+                                            BoxShadow="0 0 5 #20000000">
+                                        <TextBlock Text="{Binding OccupancyRate, StringFormat={}{0:0}%}"
+                                                   FontSize="16" 
+                                                   FontWeight="Bold" 
+                                                   Foreground="#2196F3"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
                                 </Grid>
+                                
+                                <!-- Compact Info Display -->
+                                <StackPanel Spacing="5" Margin="0,0,0,0">
+                                    <!-- Legend -->
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*" 
+                                          HorizontalAlignment="Center"
+                                          Margin="0,0,0,5">
+                                        <Rectangle Grid.Column="0" Fill="#2196F3" Width="10" Height="10" Margin="0,0,5,0"/>
+                                        <TextBlock Grid.Column="1" Text="Occupied" VerticalAlignment="Center" Margin="0,0,15,0" FontSize="11"/>
+                                        <Rectangle Grid.Column="2" Fill="#8e44ad" Width="10" Height="10" Margin="0,0,5,0"/>
+                                        <TextBlock Grid.Column="3" Text="Vacant" VerticalAlignment="Center" FontSize="11"/>
+                                    </Grid>
+                                    
+                                    <TextBlock Text="{Binding SelectedDate, StringFormat={}Date: {0:d}}" 
+                                               HorizontalAlignment="Center"
+                                               FontSize="11"/>
+                                    
+                                    <!-- Room Stats -->
+                                    <StackPanel Orientation="Horizontal" 
+                                               HorizontalAlignment="Center">
+                                        <TextBlock Text="Total Rooms: " FontSize="11"/>
+                                        <TextBlock Text="{Binding Rooms.Count}" 
+                                                  FontWeight="Bold" 
+                                                  FontSize="11"/>
+                                    </StackPanel>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
 
@@ -94,35 +165,50 @@
                                CornerRadius="8" 
                                BoxShadow="2 2 5 #20000000"
                                Padding="15">
-                            <StackPanel>
-                                <Image Source="/Assets/mews_off_brand.png" 
-                                       Height="80"
+                            <Grid RowDefinitions="Auto,Auto,*">
+                                <Image Grid.Row="0"
+                                       Source="/Assets/mews_off_brand.png" 
+                                       Height="50"
                                        HorizontalAlignment="Left"
-                                       Margin="0,0,0,20"/>
-                                <TextBlock Text="Welcome to Hotel Management System" Classes="title"/>
-                                <TextBlock Text="Use the tabs above to navigate through the system and manage your hotel's rooms, customers, and reservations."
-                                          TextWrapping="Wrap" Margin="0,10,0,15" Foreground="Black"/>
+                                       Margin="0,0,0,10"/>
+                                       
+                                <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                                    <TextBlock Text="Welcome to Hotel Management System" Classes="title"/>
+                                    <TextBlock Text="Use the tabs above to navigate through the system and manage your hotel's rooms, customers, and reservations."
+                                              TextWrapping="Wrap" Margin="0,5,0,10" Foreground="Black"/>
+                                    
+                                    <Button Content="Create New Reservation" 
+                                            HorizontalAlignment="Left" 
+                                            Margin="0,0,0,5"
+                                            Command="{Binding AddReservationCommand}"/>
+                                </StackPanel>
                                 
-                                <Button Content="Create New Reservation" 
-                                        HorizontalAlignment="Left" 
-                                        Margin="0,5,0,20"
-                                        Command="{Binding AddReservationCommand}"/>
-                                
-                                <TextBlock Text="Recent Reservations" Classes="title" Margin="0,10,0,10"/>
-                                <DataGrid MaxHeight="200"
-                                          ItemsSource="{Binding RecentReservations}"
-                                          AutoGenerateColumns="False"
-                                          IsReadOnly="True"
-                                          Background="White">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Customer" Binding="{Binding Customer.FullName}" />
-                                        <DataGridTextColumn Header="Room" Binding="{Binding Room.RoomNumber}" />
-                                        <DataGridTextColumn Header="Check-in Date" Binding="{Binding CheckInDate, StringFormat=\{0:d\}}" />
-                                        <DataGridTextColumn Header="Check-out Date" Binding="{Binding CheckOutDate, StringFormat=\{0:d\}}" />
-                                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </StackPanel>
+                                <Grid Grid.Row="2" RowDefinitions="Auto,*">
+                                    <TextBlock Grid.Row="0" Text="Recent Reservations" Classes="title" Margin="0,0,0,5"/>
+                                    
+                                    <!-- DataGrid in ScrollViewer with fixed height -->
+                                    <Border Grid.Row="1" 
+                                           BorderBrush="#DDDDDD" 
+                                           BorderThickness="1" 
+                                           CornerRadius="4">
+                                        <DataGrid ItemsSource="{Binding RecentReservations}"
+                                                  AutoGenerateColumns="False"
+                                                  IsReadOnly="True"
+                                                  Background="White"
+                                                  MaxHeight="180"
+                                                  VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Auto">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Customer" Binding="{Binding Customer.FullName}" Width="*" />
+                                                <DataGridTextColumn Header="Room" Binding="{Binding Room.RoomNumber}" Width="Auto" />
+                                                <DataGridTextColumn Header="Check-in" Binding="{Binding CheckInDate, StringFormat={}{0:d}}" Width="Auto" />
+                                                <DataGridTextColumn Header="Check-out" Binding="{Binding CheckOutDate, StringFormat={}{0:d}}" Width="Auto" />
+                                                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Border>
+                                </Grid>
+                            </Grid>
                         </Border>
                     </Grid>
                 </TabItem>
@@ -148,30 +234,35 @@
                             </StackPanel>
                         </Border>
                         
+                        <!-- Rooms Tab DataGrid -->
                         <Border Grid.Row="1" 
                                 Background="#F5F5F5" 
                                 CornerRadius="8" 
                                 BoxShadow="2 2 5 #20000000"
                                 Padding="15"
                                 Margin="0,10,0,0">
-                            <DataGrid
-                                  Margin="0"
-                                  ItemsSource="{Binding Rooms}"
-                                  SelectedItem="{Binding SelectedRoom}"
-                                  SelectionMode="Single"
-                                  SelectionChanged="DataGrid_SelectionChanged"
-                                  AutoGenerateColumns="False"
-                                  IsReadOnly="True"
-                                  Background="White">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Room Number" Binding="{Binding RoomNumber}" />
-                                    <DataGridTextColumn Header="Type" Binding="{Binding Type}" />
-                                    <DataGridTextColumn Header="Capacity" Binding="{Binding Capacity}" />
-                                    <DataGridTextColumn Header="Price per Night" Binding="{Binding PricePerNight, StringFormat=\{0:C\}}" />
-                                    <DataGridCheckBoxColumn Header="Available" Binding="{Binding IsAvailable}" />
-                                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <Grid RowDefinitions="*">
+                                <DataGrid
+                                      Margin="0"
+                                      ItemsSource="{Binding Rooms}"
+                                      SelectedItem="{Binding SelectedRoom}"
+                                      SelectionMode="Single"
+                                      SelectionChanged="DataGrid_SelectionChanged"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      Background="White">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Room Number" Binding="{Binding RoomNumber}" Width="Auto" />
+                                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="Auto" />
+                                        <DataGridTextColumn Header="Capacity" Binding="{Binding Capacity}" Width="Auto" />
+                                        <DataGridTextColumn Header="Price" Binding="{Binding PricePerNight, StringFormat={}{0:C0}}" Width="Auto" />
+                                        <DataGridCheckBoxColumn Header="Available" Binding="{Binding IsAvailable}" Width="Auto" />
+                                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
                         </Border>
                     </Grid>
                 </TabItem>
@@ -197,29 +288,34 @@
                             </StackPanel>
                         </Border>
                         
+                        <!-- Customers Tab DataGrid -->
                         <Border Grid.Row="1" 
                                 Background="#F5F5F5" 
                                 CornerRadius="8" 
                                 BoxShadow="2 2 5 #20000000"
                                 Padding="15"
                                 Margin="0,10,0,0">
-                            <DataGrid
-                                  Margin="0"
-                                  ItemsSource="{Binding Customers}"
-                                  SelectedItem="{Binding SelectedCustomer}"
-                                  SelectionMode="Single"
-                                  SelectionChanged="DataGrid_SelectionChanged"
-                                  AutoGenerateColumns="False"
-                                  IsReadOnly="True"
-                                  Background="White">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" />
-                                    <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" />
-                                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" />
-                                    <DataGridTextColumn Header="Phone Number" Binding="{Binding PhoneNumber}" />
-                                    <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*" />
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <Grid RowDefinitions="*">
+                                <DataGrid
+                                      Margin="0"
+                                      ItemsSource="{Binding Customers}"
+                                      SelectedItem="{Binding SelectedCustomer}"
+                                      SelectionMode="Single"
+                                      SelectionChanged="DataGrid_SelectionChanged"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      Background="White">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="Auto" />
+                                        <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="Auto" />
+                                        <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="Auto" />
+                                        <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="Auto" />
+                                        <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
                         </Border>
                     </Grid>
                 </TabItem>
@@ -245,30 +341,35 @@
                             </StackPanel>
                         </Border>
                         
+                        <!-- Reservations Tab DataGrid -->
                         <Border Grid.Row="1" 
                                 Background="#F5F5F5" 
                                 CornerRadius="8" 
                                 BoxShadow="2 2 5 #20000000"
                                 Padding="15"
                                 Margin="0,10,0,0">
-                            <DataGrid
-                                  Margin="0"
-                                  ItemsSource="{Binding RecentReservations}"
-                                  SelectedItem="{Binding SelectedReservation}"
-                                  SelectionMode="Single"
-                                  SelectionChanged="DataGrid_SelectionChanged"
-                                  AutoGenerateColumns="False"
-                                  IsReadOnly="True"
-                                  Background="White">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Customer" Binding="{Binding Customer.FullName}" />
-                                    <DataGridTextColumn Header="Room" Binding="{Binding Room.RoomNumber}" />
-                                    <DataGridTextColumn Header="Check-in Date" Binding="{Binding CheckInDate, StringFormat=\{0:d\}}" />
-                                    <DataGridTextColumn Header="Check-out Date" Binding="{Binding CheckOutDate, StringFormat=\{0:d\}}" />
-                                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" />
-                                    <DataGridTextColumn Header="Total Price" Binding="{Binding TotalPrice, StringFormat=\{0:C\}}" />
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <Grid RowDefinitions="*">
+                                <DataGrid
+                                      Margin="0"
+                                      ItemsSource="{Binding RecentReservations}"
+                                      SelectedItem="{Binding SelectedReservation}"
+                                      SelectionMode="Single"
+                                      SelectionChanged="DataGrid_SelectionChanged"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      Background="White">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Customer" Binding="{Binding Customer.FullName}" Width="*" />
+                                        <DataGridTextColumn Header="Room" Binding="{Binding Room.RoomNumber}" Width="Auto" />
+                                        <DataGridTextColumn Header="Check-in" Binding="{Binding CheckInDate, StringFormat={}{0:d}}" Width="Auto" />
+                                        <DataGridTextColumn Header="Check-out" Binding="{Binding CheckOutDate, StringFormat={}{0:d}}" Width="Auto" />
+                                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="Auto" />
+                                        <DataGridTextColumn Header="Price" Binding="{Binding TotalPrice, StringFormat={}{0:C0}}" Width="Auto" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
                         </Border>
                     </Grid>
                 </TabItem>

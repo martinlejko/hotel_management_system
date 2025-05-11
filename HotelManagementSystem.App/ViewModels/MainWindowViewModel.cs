@@ -3,11 +3,13 @@ using HotelManagementSystem.Core.Models;
 using HotelManagementSystem.Core.Repositories;
 using HotelManagementSystem.Core.Services;
 using Microsoft.EntityFrameworkCore;
-using OxyPlot;
-using OxyPlot.Axes;
-using OxyPlot.Series;
+using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia;
 
 namespace HotelManagementSystem.App.ViewModels
 {
@@ -21,10 +23,14 @@ namespace HotelManagementSystem.App.ViewModels
         private ObservableCollection<Reservation>? _recentReservations;
         private ObservableCollection<Room>? _rooms;
         private ObservableCollection<Customer>? _customers;
-        private PlotModel? _occupancyPlotModel;
         private string? _searchText;
         private DateTime _selectedDate;
         private double _occupancyRate;
+        private double _occupancyAngle;
+        private double _occupancyBarWidth;
+        private Point _occupancyEndPoint;
+        private bool _isLargeArc;
+        private bool _isSmallArc;
         private Room? _selectedRoom;
         private Customer? _selectedCustomer;
         private Reservation? _selectedReservation;
@@ -76,12 +82,6 @@ namespace HotelManagementSystem.App.ViewModels
             set => SetProperty(ref _customers, value);
         }
 
-        public PlotModel? OccupancyPlotModel
-        {
-            get => _occupancyPlotModel;
-            set => SetProperty(ref _occupancyPlotModel, value);
-        }
-
         public string? SearchText
         {
             get => _searchText;
@@ -110,6 +110,36 @@ namespace HotelManagementSystem.App.ViewModels
         {
             get => _occupancyRate;
             set => SetProperty(ref _occupancyRate, value);
+        }
+        
+        public double OccupancyAngle
+        {
+            get => _occupancyAngle;
+            set => SetProperty(ref _occupancyAngle, value);
+        }
+        
+        public double OccupancyBarWidth
+        {
+            get => _occupancyBarWidth;
+            set => SetProperty(ref _occupancyBarWidth, value);
+        }
+        
+        public Point OccupancyEndPoint
+        {
+            get => _occupancyEndPoint;
+            set => SetProperty(ref _occupancyEndPoint, value);
+        }
+        
+        public bool IsLargeArc
+        {
+            get => _isLargeArc;
+            set => SetProperty(ref _isLargeArc, value);
+        }
+        
+        public bool IsSmallArc
+        {
+            get => _isSmallArc;
+            set => SetProperty(ref _isSmallArc, value);
         }
         
         public Room? SelectedRoom
@@ -288,46 +318,20 @@ namespace HotelManagementSystem.App.ViewModels
                 var reservationRepo = new ReservationRepository(context);
                 var statsService = new HotelStatsService(roomRepo, reservationRepo);
 
-                var startDate = SelectedDate;
-                var endDate = startDate.AddDays(6);
-                var occupancyStats = await statsService.GetOccupancyStatsForDateRangeAsync(startDate, endDate);
-
                 var currentStats = await statsService.GetCurrentOccupancyAsync();
                 OccupancyRate = currentStats.OccupancyRate * 100;
-
-                var plotModel = new PlotModel { Title = "Occupancy Forecast" };
                 
-                var xAxis = new CategoryAxis
-                {
-                    Position = AxisPosition.Bottom,
-                    Title = "Date"
-                };
-
-                var yAxis = new LinearAxis
-                {
-                    Position = AxisPosition.Left,
-                    Title = "Occupancy Rate (%)",
-                    Minimum = 0,
-                    Maximum = 100
-                };
-
-                plotModel.Axes.Add(xAxis);
-                plotModel.Axes.Add(yAxis);
-
-                var occupancySeries = new BarSeries
-                {
-                    Title = "Occupancy Rate",
-                    FillColor = OxyColor.FromRgb(0, 158, 115),
-                };
-
-                foreach (var stat in occupancyStats)
-                {
-                    xAxis.Labels.Add(stat.Date.ToString("MM/dd"));
-                    occupancySeries.Items.Add(new BarItem(stat.OccupancyRate * 100));
-                }
-
-                plotModel.Series.Add(occupancySeries);
-                OccupancyPlotModel = plotModel;
+                // Calculate pie chart parameters - radius is now 60px
+                double angleInRadians = OccupancyRate * 3.6 * (Math.PI / 180); // Convert to radians
+                
+                // Calculate end point using 60px radius
+                double x = 60 + 60 * Math.Sin(angleInRadians);
+                double y = 60 - 60 * Math.Cos(angleInRadians);
+                OccupancyEndPoint = new Point(x, y);
+                
+                // Determine if arc is large or small
+                IsLargeArc = OccupancyRate > 50;
+                IsSmallArc = OccupancyRate <= 50;
             }
         }
 
@@ -346,9 +350,9 @@ namespace HotelManagementSystem.App.ViewModels
                 
                 var searchText = SearchText ?? string.Empty;
                 var filteredReservations = allReservations.Where(r => 
-                    (r.Customer?.FirstName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) == true) ||
-                    (r.Customer?.LastName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) == true) ||
-                    (r.Room?.RoomNumber?.Contains(searchText, StringComparison.OrdinalIgnoreCase) == true))
+                    (r.Customer?.FirstName?.Contains(searchText, System.StringComparison.OrdinalIgnoreCase) == true) ||
+                    (r.Customer?.LastName?.Contains(searchText, System.StringComparison.OrdinalIgnoreCase) == true) ||
+                    (r.Room?.RoomNumber?.Contains(searchText, System.StringComparison.OrdinalIgnoreCase) == true))
                     .Take(10);
                 
                 RecentReservations?.Clear();
