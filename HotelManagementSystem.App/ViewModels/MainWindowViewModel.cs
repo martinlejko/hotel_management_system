@@ -1,4 +1,3 @@
-using Avalonia.Controls;
 using HotelManagementSystem.Core.Data;
 using HotelManagementSystem.Core.Models;
 using HotelManagementSystem.Core.Repositories;
@@ -7,10 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace HotelManagementSystem.App.ViewModels
@@ -18,7 +14,6 @@ namespace HotelManagementSystem.App.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly DbContextOptions<HotelDbContext> _dbOptions;
-        private readonly IHotelStatsService? _statsService;
         private readonly IReservationRepository? _reservationRepository;
         private readonly IRoomRepository? _roomRepository;
         private readonly ICustomerRepository? _customerRepository;
@@ -190,26 +185,21 @@ namespace HotelManagementSystem.App.ViewModels
         {
             _dbOptions = dbOptions;
             
-            // Initialize repositories and services
             using (var context = new HotelDbContext(_dbOptions))
             {
                 _reservationRepository = new ReservationRepository(context);
                 _roomRepository = new RoomRepository(context);
                 _customerRepository = new CustomerRepository(context);
-                _statsService = new HotelStatsService(_roomRepository, _reservationRepository);
             }
 
-            // Initialize collections
             RecentReservations = new ObservableCollection<Reservation>();
             Rooms = new ObservableCollection<Room>();
             Customers = new ObservableCollection<Customer>();
             
-            // Initialize properties
             SelectedDate = DateTime.Today;
             SearchText = string.Empty;
             IsViewingList = true;
             
-            // Initialize commands
             AddRoomCommand = new RelayCommand(_ => AddRoom());
             EditRoomCommand = new RelayCommand(_ => EditRoom(), _ => SelectedRoom != null);
             DeleteRoomCommand = new RelayCommand(_ => ShowDeleteConfirmation(DeleteItemType.Room), _ => SelectedRoom != null);
@@ -225,11 +215,9 @@ namespace HotelManagementSystem.App.ViewModels
             RefreshDataCommand = new RelayCommand(async _ => await LoadDataAsync());
             BackToListCommand = new RelayCommand(_ => ShowListView());
             
-            // Delete confirmation commands
             ConfirmDeleteCommand = new RelayCommand(async _ => await ConfirmDeleteAsync());
             CancelDeleteCommand = new RelayCommand(_ => CancelDelete());
 
-            // Load initial data
             LoadDataAsync().ConfigureAwait(false);
         }
         
@@ -300,16 +288,13 @@ namespace HotelManagementSystem.App.ViewModels
                 var reservationRepo = new ReservationRepository(context);
                 var statsService = new HotelStatsService(roomRepo, reservationRepo);
 
-                // Get occupancy for the next 7 days
                 var startDate = SelectedDate;
                 var endDate = startDate.AddDays(6);
                 var occupancyStats = await statsService.GetOccupancyStatsForDateRangeAsync(startDate, endDate);
 
-                // Update current occupancy rate
                 var currentStats = await statsService.GetCurrentOccupancyAsync();
                 OccupancyRate = currentStats.OccupancyRate * 100;
 
-                // Create plot model
                 var plotModel = new PlotModel { Title = "Occupancy Forecast" };
                 
                 var xAxis = new CategoryAxis
@@ -359,7 +344,6 @@ namespace HotelManagementSystem.App.ViewModels
                 var reservationRepo = new ReservationRepository(context);
                 var allReservations = await reservationRepo.GetAllReservationsWithDetailsAsync();
                 
-                // Only perform filtering if SearchText is not null
                 var searchText = SearchText ?? string.Empty;
                 var filteredReservations = allReservations.Where(r => 
                     (r.Customer?.FirstName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) == true) ||
@@ -375,7 +359,6 @@ namespace HotelManagementSystem.App.ViewModels
             }
         }
         
-        // Room operations
         private void AddRoom()
         {
             var viewModel = new RoomFormViewModel();
@@ -406,26 +389,21 @@ namespace HotelManagementSystem.App.ViewModels
                 
                 if (room.Id == 0)
                 {
-                    // New room
                     await roomRepo.AddAsync(room);
                 }
                 else
                 {
-                    // Existing room
                     await roomRepo.UpdateAsync(room);
                 }
                 
                 await roomRepo.SaveChangesAsync();
             }
             
-            // Refresh rooms list
             await LoadRoomsAsync();
             
-            // Go back to list view
             ShowListView();
         }
         
-        // Customer operations
         private void AddCustomer()
         {
             var viewModel = new CustomerFormViewModel();
@@ -456,26 +434,21 @@ namespace HotelManagementSystem.App.ViewModels
                 
                 if (customer.Id == 0)
                 {
-                    // New customer
                     await customerRepo.AddAsync(customer);
                 }
                 else
                 {
-                    // Existing customer
                     await customerRepo.UpdateAsync(customer);
                 }
                 
                 await customerRepo.SaveChangesAsync();
             }
             
-            // Refresh customers list
             await LoadCustomersAsync();
             
-            // Go back to list view
             ShowListView();
         }
         
-        // Reservation operations
         private void AddReservation()
         {
             var viewModel = new ReservationFormViewModel(_dbOptions);
@@ -506,25 +479,20 @@ namespace HotelManagementSystem.App.ViewModels
                 
                 if (reservation.Id == 0)
                 {
-                    // New reservation
                     await reservationRepo.AddAsync(reservation);
                 }
                 else
                 {
-                    // Existing reservation
                     await reservationRepo.UpdateAsync(reservation);
                 }
                 
                 await reservationRepo.SaveChangesAsync();
             }
             
-            // Refresh reservations list
             await LoadReservationsAsync();
             
-            // Also refresh occupancy data as it may have changed
             await LoadOccupancyDataAsync();
             
-            // Go back to list view
             ShowListView();
         }
         
@@ -533,7 +501,6 @@ namespace HotelManagementSystem.App.ViewModels
             ShowListView();
         }
 
-        // Delete confirmation methods
         private void ShowDeleteConfirmation(DeleteItemType itemType)
         {
             _deleteItemType = itemType;
@@ -606,11 +573,9 @@ namespace HotelManagementSystem.App.ViewModels
                 var roomRepo = new RoomRepository(context);
                 var reservationRepo = new ReservationRepository(context);
                 
-                // Check if room has any reservations
                 var hasReservations = await reservationRepo.HasReservationsForRoomAsync(SelectedRoom.Id);
                 if (hasReservations)
                 {
-                    // Show error message in the same panel
                     DeleteConfirmationTitle = "Cannot Delete Room";
                     DeleteConfirmationMessage = $"Room {SelectedRoom.RoomNumber} has existing reservations and cannot be deleted. Please delete the reservations first.";
                     return;
@@ -622,7 +587,6 @@ namespace HotelManagementSystem.App.ViewModels
                     await roomRepo.DeleteAsync(room);
                     await roomRepo.SaveChangesAsync();
                     
-                    // Refresh rooms list
                     await LoadRoomsAsync();
                     IsConfirmingDelete = false;
                 }
@@ -638,11 +602,9 @@ namespace HotelManagementSystem.App.ViewModels
                 var customerRepo = new CustomerRepository(context);
                 var reservationRepo = new ReservationRepository(context);
                 
-                // Check if customer has any reservations
                 var hasReservations = await reservationRepo.HasReservationsForCustomerAsync(SelectedCustomer.Id);
                 if (hasReservations)
                 {
-                    // Show error message in the same panel
                     DeleteConfirmationTitle = "Cannot Delete Customer";
                     DeleteConfirmationMessage = $"Customer {SelectedCustomer.FirstName} {SelectedCustomer.LastName} has existing reservations and cannot be deleted. Please delete the reservations first.";
                     return;
@@ -654,7 +616,6 @@ namespace HotelManagementSystem.App.ViewModels
                     await customerRepo.DeleteAsync(customer);
                     await customerRepo.SaveChangesAsync();
                     
-                    // Refresh customers list
                     await LoadCustomersAsync();
                     IsConfirmingDelete = false;
                 }
@@ -674,9 +635,7 @@ namespace HotelManagementSystem.App.ViewModels
                     await reservationRepo.DeleteAsync(reservation);
                     await reservationRepo.SaveChangesAsync();
                     
-                    // Refresh reservations list
                     await LoadReservationsAsync();
-                    // Also refresh occupancy data as it may have changed
                     await LoadOccupancyDataAsync();
                     IsConfirmingDelete = false;
                 }

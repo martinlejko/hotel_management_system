@@ -1,10 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
 using HotelManagementSystem.Core.Validation;
-using System;
 
 namespace HotelManagementSystem.App.Views
 {
@@ -34,34 +31,25 @@ namespace HotelManagementSystem.App.Views
             _capacityErrorText = this.FindControl<TextBlock>("CapacityErrorText");
             _saveButton = this.FindControl<Button>("SaveButton");
             
-            // Set up room number validation
             if (_roomNumberTextBox != null)
             {
                 _roomNumberTextBox.TextChanged += (s, e) => ValidateRoomNumber();
-                _roomNumberTextBox.LostFocus += (s, e) => ValidateRoomNumber();
             }
             
-            // Set up price validation
             if (_priceTextBox != null)
             {
-                // Single handler for ValueChanged that handles null values and performs validation
                 _priceTextBox.ValueChanged += (s, e) => 
                 {
                     if (_priceTextBox.Value == null)
                     {
-                        _priceTextBox.Value = 0;
+                        _priceTextBox.Value = 100;
                     }
                     ValidatePrice();
                 };
-                
-                // Only need LostFocus for currency format - validation happens in ValueChanged
-                _priceTextBox.LostFocus += (s, e) => EnsureCurrencyFormat();
             }
             
-            // Set up capacity validation
             if (_capacityTextBox != null)
             {
-                // Single handler for ValueChanged that handles null values and performs validation
                 _capacityTextBox.ValueChanged += (s, e) => 
                 {
                     if (_capacityTextBox.Value == null)
@@ -72,16 +60,12 @@ namespace HotelManagementSystem.App.Views
                 };
             }
             
-            // Perform initial validation
             ValidateRoomNumber();
             ValidatePrice();
             ValidateCapacity();
         }
 
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
+        private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
         private void ValidateRoomNumber()
         {
@@ -114,11 +98,9 @@ namespace HotelManagementSystem.App.Views
         {
             if (_priceTextBox == null || _priceErrorText == null) return;
             
-            // Safely handle null value
             decimal? rawValue = _priceTextBox.Value;
             decimal price = rawValue ?? 0;
             
-            // Price should be positive
             bool isValid = price >= 0;
             
             _isPriceValid = isValid;
@@ -136,7 +118,6 @@ namespace HotelManagementSystem.App.Views
                 ToolTip.SetTip(_priceTextBox, errorMessage);
                 _priceErrorText.Text = errorMessage;
                 
-                // Reset to minimum value if invalid or null
                 if (!rawValue.HasValue || price < 0)
                 {
                     _priceTextBox.Value = 0;
@@ -150,11 +131,9 @@ namespace HotelManagementSystem.App.Views
         {
             if (_capacityTextBox == null || _capacityErrorText == null) return;
             
-            // Safely handle null value
             decimal? rawValue = _capacityTextBox.Value;
             int capacity = rawValue.HasValue ? (int)rawValue.Value : 0;
             
-            // Capacity should be at least 1
             bool isValid = capacity >= 1;
             
             _isCapacityValid = isValid;
@@ -172,7 +151,6 @@ namespace HotelManagementSystem.App.Views
                 ToolTip.SetTip(_capacityTextBox, errorMessage);
                 _capacityErrorText.Text = errorMessage;
                 
-                // Reset to minimum value if invalid
                 if (!rawValue.HasValue)
                 {
                     _capacityTextBox.Value = 1;
@@ -180,14 +158,6 @@ namespace HotelManagementSystem.App.Views
             }
             
             UpdateSaveButtonState();
-        }
-        
-        private void EnsureCurrencyFormat()
-        {
-            if (_priceTextBox == null) return;
-            
-            // This is redundant as format string is already set in XAML
-            // _priceTextBox.FormatString = "C0";
         }
         
         private void UpdateSaveButtonState()

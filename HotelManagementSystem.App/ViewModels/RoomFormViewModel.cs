@@ -1,6 +1,4 @@
 using HotelManagementSystem.Core.Models;
-using System;
-using System.Collections.Generic;
 using System.Windows.Input;
 
 namespace HotelManagementSystem.App.ViewModels
@@ -41,7 +39,6 @@ namespace HotelManagementSystem.App.ViewModels
             get => _capacity;
             set 
             { 
-                // Ensure capacity is never less than 1
                 int validValue = value < 1 ? 1 : value;
                 if (SetProperty(ref _capacity, validValue))
                 {
@@ -83,12 +80,11 @@ namespace HotelManagementSystem.App.ViewModels
         {
             _originalRoom = room;
             
-            // If editing an existing room, populate the fields
             if (room != null)
             {
                 RoomNumber = room.RoomNumber;
                 SelectedRoomType = room.Type;
-                Capacity = room.Capacity < 1 ? 1 : room.Capacity; // Ensure capacity is at least 1
+                Capacity = room.Capacity < 1 ? 1 : room.Capacity;
                 PricePerNight = room.PricePerNight;
                 Description = room.Description;
                 IsAvailable = room.IsAvailable;
@@ -100,21 +96,16 @@ namespace HotelManagementSystem.App.ViewModels
         
         private bool CanSave()
         {
-            // The detailed validation is already handled in the View,
-            // so we only need basic checks here
             return !string.IsNullOrWhiteSpace(RoomNumber) && Capacity >= 1 && PricePerNight >= 0;
         }
         
         private void Save()
         {
-            // The Save button should be disabled when validation fails,
-            // so this check shouldn't be necessary, but kept for safety
             if (string.IsNullOrWhiteSpace(RoomNumber) || Capacity < 1)
             {
                 return;
             }
             
-            // Create or update the room
             Room room = _originalRoom ?? new Room();
             room.RoomNumber = RoomNumber;
             room.Type = SelectedRoomType;
@@ -123,7 +114,6 @@ namespace HotelManagementSystem.App.ViewModels
             room.Description = Description;
             room.IsAvailable = IsAvailable;
             
-            // Notify that save is completed
             SaveCompleted?.Invoke(room);
         }
         

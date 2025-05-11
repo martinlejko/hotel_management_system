@@ -1,5 +1,4 @@
 using HotelManagementSystem.Core.Models;
-using System;
 using System.Windows.Input;
 
 namespace HotelManagementSystem.App.ViewModels

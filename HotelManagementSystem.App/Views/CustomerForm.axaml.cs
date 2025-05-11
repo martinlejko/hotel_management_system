@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 using HotelManagementSystem.Core.Validation;
-using System;
 
 namespace HotelManagementSystem.App.Views
 {
@@ -21,7 +20,6 @@ namespace HotelManagementSystem.App.Views
         
         private Button? _saveButton;
         
-        // Track validation state for each field
         private bool _isEmailValid = true;
         private bool _isPhoneValid = true;
         private bool _isFirstNameValid = true;
@@ -31,7 +29,6 @@ namespace HotelManagementSystem.App.Views
         {
             InitializeComponent();
             
-            // Find controls after initialization
             _emailTextBox = this.FindControl<TextBox>("EmailTextBox");
             _phoneTextBox = this.FindControl<TextBox>("PhoneTextBox");
             _firstNameTextBox = this.FindControl<TextBox>("FirstNameTextBox");
@@ -44,7 +41,6 @@ namespace HotelManagementSystem.App.Views
             
             _saveButton = this.FindControl<Button>("SaveButton");
             
-            // Set up validation
             if (_emailTextBox != null)
             {
                 _emailTextBox.TextChanged += (s, e) => ValidateEmail();
@@ -65,7 +61,6 @@ namespace HotelManagementSystem.App.Views
                 _lastNameTextBox.TextChanged += (s, e) => ValidateLastName();
             }
             
-            // Perform initial validation
             ValidateAllFields();
         }
 
@@ -92,7 +87,6 @@ namespace HotelManagementSystem.App.Views
             
             string phone = _phoneTextBox.Text ?? string.Empty;
             
-            // Phone is optional, so empty is valid
             if (string.IsNullOrWhiteSpace(phone))
             {
                 UpdateValidationVisuals(_phoneTextBox, _phoneErrorText, true, string.Empty);

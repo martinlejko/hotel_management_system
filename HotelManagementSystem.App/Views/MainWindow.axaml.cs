@@ -1,7 +1,5 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using HotelManagementSystem.App.ViewModels;
 
 namespace HotelManagementSystem.App.Views
 {
@@ -10,9 +8,6 @@ namespace HotelManagementSystem.App.Views
         public MainWindow()
         {
             InitializeComponent();
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
 
         private void InitializeComponent()
@@ -22,8 +17,6 @@ namespace HotelManagementSystem.App.Views
         
         private void DataGrid_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            // This method is just to ensure the selection binding works properly
-            // The actual logic is handled in the view model's property setters
         }
     }
 } 

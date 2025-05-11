@@ -2,10 +2,7 @@ using HotelManagementSystem.Core.Data;
 using HotelManagementSystem.Core.Models;
 using HotelManagementSystem.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Threading;
 
@@ -73,7 +70,6 @@ namespace HotelManagementSystem.App.ViewModels
             {
                 if (SetProperty(ref _checkInDate, value))
                 {
-                    // Ensure check-out date is after check-in date
                     if (CheckOutDate <= CheckInDate)
                     {
                         CheckOutDate = CheckInDate.AddDays(1);
@@ -93,7 +89,6 @@ namespace HotelManagementSystem.App.ViewModels
             {
                 if (SetProperty(ref _checkOutDate, value))
                 {
-                    // Ensure check-out date is after check-in date
                     if (CheckOutDate <= CheckInDate)
                     {
                         CheckInDate = CheckOutDate.AddDays(-1);
@@ -134,7 +129,6 @@ namespace HotelManagementSystem.App.ViewModels
             _dbOptions = dbOptions;
             _originalReservation = reservation;
             
-            // If editing an existing reservation, populate the fields
             if (reservation != null)
             {
                 CheckInDate = reservation.CheckInDate;
@@ -147,7 +141,6 @@ namespace HotelManagementSystem.App.ViewModels
             SaveCommand = new RelayCommand(_ => Save(), _ => CanSave());
             CancelCommand = new RelayCommand(_ => Cancel());
             
-            // Load data
             Task.Run(async () => await LoadInitialDataAsync());
         }
         
@@ -174,7 +167,6 @@ namespace HotelManagementSystem.App.ViewModels
                             Customers.Add(customer);
                         }
                         
-                        // Set selected customer if editing
                         if (_originalReservation != null && _originalReservation.CustomerId > 0)
                         {
                             SelectedCustomer = Customers.FirstOrDefault(c => c.Id == _originalReservation.CustomerId);
@@ -190,7 +182,6 @@ namespace HotelManagementSystem.App.ViewModels
             }
             catch (Exception ex)
             {
-                // Log error
                 Console.WriteLine($"Error loading customers: {ex.Message}");
             }
         }
@@ -204,16 +195,13 @@ namespace HotelManagementSystem.App.ViewModels
                     var roomRepo = new RoomRepository(context);
                     var reservationRepo = new ReservationRepository(context);
                     
-                    // Get all rooms
                     var allRooms = await roomRepo.GetAllAsync();
                     
-                    // Get rooms that are already booked for the selected date range
                     var bookedRoomIds = await reservationRepo.GetBookedRoomIdsAsync(
                         CheckInDate, 
                         CheckOutDate,
-                        _originalReservation?.Id ?? 0); // Exclude current reservation if editing
+                        _originalReservation?.Id ?? 0);
                     
-                    // Filter available rooms
                     var availableRooms = allRooms.Where(r => 
                         r.IsAvailable && 
                         !bookedRoomIds.Contains(r.Id)).ToList();
@@ -226,10 +214,8 @@ namespace HotelManagementSystem.App.ViewModels
                             AvailableRooms.Add(room);
                         }
                         
-                        // Set selected room if editing
                         if (_originalReservation != null && _originalReservation.RoomId > 0)
                         {
-                            // For edit, we need to include the currently selected room even if it's booked
                             var currentRoom = allRooms.FirstOrDefault(r => r.Id == _originalReservation.RoomId);
                             if (currentRoom != null && !AvailableRooms.Contains(currentRoom))
                             {
@@ -250,7 +236,6 @@ namespace HotelManagementSystem.App.ViewModels
             }
             catch (Exception ex)
             {
-                // Log error
                 Console.WriteLine($"Error loading available rooms: {ex.Message}");
             }
         }
@@ -276,11 +261,9 @@ namespace HotelManagementSystem.App.ViewModels
         {
             if (SelectedCustomer == null || SelectedRoom == null)
             {
-                // In a real app, show an error message
                 return;
             }
             
-            // Create or update the reservation
             Reservation reservation = _originalReservation ?? new Reservation();
             reservation.CustomerId = SelectedCustomer.Id;
             reservation.RoomId = SelectedRoom.Id;
@@ -290,15 +273,12 @@ namespace HotelManagementSystem.App.ViewModels
             reservation.TotalPrice = TotalPrice;
             reservation.SpecialRequests = SpecialRequests;
             
-            // Only set navigation properties when updating an existing reservation
-            // This prevents EF Core from trying to add a new customer or room when saving
             if (_originalReservation != null)
             {
                 reservation.Customer = SelectedCustomer;
                 reservation.Room = SelectedRoom;
             }
             
-            // Notify that save is completed
             SaveCompleted?.Invoke(reservation);
         }
         
