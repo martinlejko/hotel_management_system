@@ -39,11 +39,12 @@
                 
                 <TextBlock Text="Price per Night:"/>
                 <NumericUpDown x:Name="PriceTextBox" 
-                               Value="{Binding PricePerNight}" 
+                               Value="{Binding PricePerNight, Mode=TwoWay}" 
                                Minimum="0" 
                                Increment="10" 
                                FormatString="C0" 
                                ClipValueToMinMax="True"
+                               AllowSpin="True"
                                ShowButtonSpinner="True"/>
                 <TextBlock x:Name="PriceErrorText" Foreground="#E53935" FontSize="12" Margin="0,2,0,5"/>
                 

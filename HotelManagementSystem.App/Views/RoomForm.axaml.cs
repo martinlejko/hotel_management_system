@@ -44,13 +44,34 @@ namespace HotelManagementSystem.App.Views
             // Set up price validation
             if (_priceTextBox != null)
             {
+                // Initialize with a valid value and prevent nulls
+                if (_priceTextBox.Value == null)
+                {
+                    _priceTextBox.Value = 0;
+                }
+                
                 // Ensure the price always has the currency format
                 _priceTextBox.FormatString = "C0"; // "C0" is currency with 0 decimal places
+                
+                // Handle direct text input to prevent nulls
+                _priceTextBox.KeyDown += (s, e) =>
+                {
+                    // Do this on a slight delay to let the control update first
+                    Dispatcher.UIThread.Post(EnsureValidPrice, DispatcherPriority.Background);
+                };
                 
                 // Set up event handlers to prevent removing the currency symbol
                 _priceTextBox.GotFocus += (s, e) => EnsureCurrencyFormat();
                 _priceTextBox.LostFocus += (s, e) => EnsureCurrencyFormat();
-                _priceTextBox.ValueChanged += (s, e) => ValidatePrice();
+                _priceTextBox.ValueChanged += (s, e) => 
+                {
+                    // If value becomes null during editing, reset to 0
+                    if (_priceTextBox.Value == null)
+                    {
+                        _priceTextBox.Value = 0;
+                    }
+                    ValidatePrice();
+                };
                 _priceTextBox.LostFocus += (s, e) => ValidatePrice();
             }
             
@@ -124,7 +145,9 @@ namespace HotelManagementSystem.App.Views
         {
             if (_priceTextBox == null || _priceErrorText == null) return;
             
-            decimal price = _priceTextBox.Value ?? 0;
+            // Safely handle null value
+            decimal? rawValue = _priceTextBox.Value;
+            decimal price = rawValue ?? 0;
             
             // Price should be positive
             bool isValid = price >= 0;
@@ -143,6 +166,12 @@ namespace HotelManagementSystem.App.Views
                 string errorMessage = "Price must be a positive value";
                 ToolTip.SetTip(_priceTextBox, errorMessage);
                 _priceErrorText.Text = errorMessage;
+                
+                // Reset to minimum value if invalid or null
+                if (!rawValue.HasValue || price < 0)
+                {
+                    _priceTextBox.Value = 0;
+                }
             }
             
             // Ensure the currency format is always applied
@@ -217,6 +246,14 @@ namespace HotelManagementSystem.App.Views
             if (_capacityTextBox != null && _capacityTextBox.Value == null)
             {
                 _capacityTextBox.Value = 1;
+            }
+        }
+        
+        private void EnsureValidPrice()
+        {
+            if (_priceTextBox != null && _priceTextBox.Value == null)
+            {
+                _priceTextBox.Value = 0;
             }
         }
     }
