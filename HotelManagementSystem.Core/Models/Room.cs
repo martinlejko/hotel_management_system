@@ -25,7 +25,6 @@ namespace HotelManagementSystem.Core.Models
 
         public bool IsAvailable { get; set; } = true;
 
-        // Navigation property - one room can have many reservations
         public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 

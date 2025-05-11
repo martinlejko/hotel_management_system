@@ -60,48 +60,5 @@ namespace HotelManagementSystem.Core.Services
             
             return result;
         }
-
-        public async Task<RevenueStats> GetRevenueStatsAsync(DateTime startDate, DateTime endDate)
-        {
-            var reservations = await _reservationRepository.GetReservationsByDateRangeAsync(startDate, endDate);
-            
-            var totalRevenue = reservations.Sum(r => r.TotalPrice);
-            var confirmedRevenue = reservations
-                .Where(r => r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.CheckedIn || r.Status == ReservationStatus.CheckedOut)
-                .Sum(r => r.TotalPrice);
-            
-            return new RevenueStats
-            {
-                StartDate = startDate,
-                EndDate = endDate,
-                TotalRevenue = totalRevenue,
-                ConfirmedRevenue = confirmedRevenue
-            };
-        }
-    }
-
-    public interface IHotelStatsService
-    {
-        Task<OccupancyStats> GetCurrentOccupancyAsync();
-        Task<OccupancyStats> GetOccupancyStatsAsync(DateTime startDate, DateTime endDate);
-        Task<IEnumerable<OccupancyStats>> GetOccupancyStatsForDateRangeAsync(DateTime startDate, DateTime endDate);
-        Task<RevenueStats> GetRevenueStatsAsync(DateTime startDate, DateTime endDate);
-    }
-
-    public class OccupancyStats
-    {
-        public DateTime Date { get; set; }
-        public int TotalRooms { get; set; }
-        public int OccupiedRooms { get; set; }
-        public int AvailableRooms { get; set; }
-        public double OccupancyRate { get; set; }
-    }
-
-    public class RevenueStats
-    {
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public decimal TotalRevenue { get; set; }
-        public decimal ConfirmedRevenue { get; set; }
     }
 } 

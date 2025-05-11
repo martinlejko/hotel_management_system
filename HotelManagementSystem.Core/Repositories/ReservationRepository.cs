@@ -23,14 +23,6 @@ namespace HotelManagementSystem.Core.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Reservation?> GetReservationWithDetailsAsync(int reservationId)
-        {
-            return await _context.Reservations
-                .Include(r => r.Customer)
-                .Include(r => r.Room)
-                .FirstOrDefaultAsync(r => r.Id == reservationId);
-        }
-
         public async Task<IEnumerable<Reservation>> GetReservationsByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             return await _context.Reservations
@@ -44,31 +36,29 @@ namespace HotelManagementSystem.Core.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Reservation>> GetReservationsByCustomerAsync(int customerId)
-        {
-            return await _context.Reservations
-                .Include(r => r.Room)
-                .Where(r => r.CustomerId == customerId)
-                .OrderByDescending(r => r.CheckInDate)
-                .ToListAsync();
-        }
+        // public async Task<IEnumerable<Reservation>> GetReservationsByCustomerAsync(int customerId)
+        // {
+        //     return await _context.Reservations
+        //         .Include(r => r.Room)
+        //         .Where(r => r.CustomerId == customerId)
+        //         .OrderByDescending(r => r.CheckInDate)
+        //         .ToListAsync();
+        // }
 
-        public async Task<bool> IsRoomAvailableAsync(int roomId, DateTime checkIn, DateTime checkOut)
-        {
-            // Check if there are any overlapping reservations for the given room
-            var overlappingReservations = await _context.Reservations
-                .Where(r => 
-                    r.RoomId == roomId && 
-                    (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.CheckedIn) &&
-                    ((r.CheckInDate <= checkOut && r.CheckOutDate >= checkIn)))
-                .CountAsync();
+        // public async Task<bool> IsRoomAvailableAsync(int roomId, DateTime checkIn, DateTime checkOut)
+        // {
+        //     var overlappingReservations = await _context.Reservations
+        //         .Where(r => 
+        //             r.RoomId == roomId && 
+        //             (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.CheckedIn) &&
+        //             r.CheckInDate <= checkOut && r.CheckOutDate >= checkIn)
+        //         .CountAsync();
 
-            return overlappingReservations == 0;
-        }
+        //     return overlappingReservations == 0;
+        // }
 
         public async Task<IEnumerable<int>> GetBookedRoomIdsAsync(DateTime checkIn, DateTime checkOut, int excludeReservationId = 0)
         {
-            // Get IDs of rooms that have overlapping reservations for the given date range
             return await _context.Reservations
                 .Where(r => 
                     r.Id != excludeReservationId &&

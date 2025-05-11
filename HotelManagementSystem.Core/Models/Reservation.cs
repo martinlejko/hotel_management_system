@@ -35,9 +35,6 @@ namespace HotelManagementSystem.Core.Models
         [NotMapped]
         public int DurationInDays => (CheckOutDate - CheckInDate).Days;
 
-        [NotMapped]
-        public bool IsActive => Status == ReservationStatus.Confirmed || Status == ReservationStatus.CheckedIn;
-
         public void CalculateTotalPrice()
         {
             if (Room != null && DurationInDays > 0)
