@@ -53,54 +53,38 @@ namespace HotelManagementSystem.App.Views
                 // Ensure the price always has the currency format
                 _priceTextBox.FormatString = "C0"; // "C0" is currency with 0 decimal places
                 
-                // Handle direct text input to prevent nulls
-                _priceTextBox.KeyDown += (s, e) =>
-                {
-                    // Do this on a slight delay to let the control update first
-                    Dispatcher.UIThread.Post(EnsureValidPrice, DispatcherPriority.Background);
-                };
-                
-                // Set up event handlers to prevent removing the currency symbol
-                _priceTextBox.GotFocus += (s, e) => EnsureCurrencyFormat();
-                _priceTextBox.LostFocus += (s, e) => EnsureCurrencyFormat();
+                // Single handler for ValueChanged that handles null values and performs validation
                 _priceTextBox.ValueChanged += (s, e) => 
                 {
-                    // If value becomes null during editing, reset to 0
                     if (_priceTextBox.Value == null)
                     {
                         _priceTextBox.Value = 0;
                     }
                     ValidatePrice();
                 };
-                _priceTextBox.LostFocus += (s, e) => ValidatePrice();
+                
+                // Only need LostFocus for currency format - validation happens in ValueChanged
+                _priceTextBox.LostFocus += (s, e) => EnsureCurrencyFormat();
             }
             
             // Set up capacity validation
             if (_capacityTextBox != null)
             {
-                // Initialize with a valid value and prevent nulls
+                // Initialize with a valid value 
                 if (_capacityTextBox.Value == null)
                 {
                     _capacityTextBox.Value = 1;
                 }
                 
-                // Handle direct text input to prevent nulls
-                _capacityTextBox.KeyDown += (s, e) =>
-                {
-                    // Do this on a slight delay to let the control update first
-                    Dispatcher.UIThread.Post(EnsureValidCapacity, DispatcherPriority.Background);
-                };
-                
+                // Single handler for ValueChanged that handles null values and performs validation
                 _capacityTextBox.ValueChanged += (s, e) => 
                 {
-                    // If value becomes null during editing, reset to 1
                     if (_capacityTextBox.Value == null)
                     {
                         _capacityTextBox.Value = 1;
                     }
                     ValidateCapacity();
                 };
-                _capacityTextBox.LostFocus += (s, e) => ValidateCapacity();
             }
             
             // Perform initial validation
@@ -174,9 +158,6 @@ namespace HotelManagementSystem.App.Views
                 }
             }
             
-            // Ensure the currency format is always applied
-            _priceTextBox.FormatString = "C0";
-            
             UpdateSaveButtonState();
         }
         
@@ -238,22 +219,6 @@ namespace HotelManagementSystem.App.Views
             else
             {
                 ToolTip.SetTip(_saveButton, null);
-            }
-        }
-        
-        private void EnsureValidCapacity()
-        {
-            if (_capacityTextBox != null && _capacityTextBox.Value == null)
-            {
-                _capacityTextBox.Value = 1;
-            }
-        }
-        
-        private void EnsureValidPrice()
-        {
-            if (_priceTextBox != null && _priceTextBox.Value == null)
-            {
-                _priceTextBox.Value = 0;
             }
         }
     }

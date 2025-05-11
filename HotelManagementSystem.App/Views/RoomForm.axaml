@@ -3,14 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:HotelManagementSystem.App.ViewModels"
-             xmlns:conv="using:HotelManagementSystem.App.Converters"
              mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
              x:Class="HotelManagementSystem.App.Views.RoomForm"
              x:DataType="vm:RoomFormViewModel">
-
-    <UserControl.Resources>
-        <conv:IntToNonNullableIntConverter x:Key="IntConverter"/>
-    </UserControl.Resources>
 
     <ScrollViewer>
         <Grid RowDefinitions="*,Auto" Margin="20">
