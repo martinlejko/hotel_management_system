@@ -8,7 +8,7 @@ A cross-platform desktop application for hotel management built with C# and Aval
 - **🛏️ Room Management**: Add, edit, and view hotel rooms with different types and rates
 - **👥 Customer Management**: Track customer information, contact details, and stay history
 - **📅 Reservation System**: Create and manage reservations with check-in/check-out dates
-- **🔎 Search Functionality**: Find reservations by customer name, room number, or date range
+- **🔎 Search Functionality**: Find reservations by customer name, room number
 
 ## 🛠️ Technology Stack
 
@@ -102,7 +102,6 @@ The project follows MVVM architecture:
 ### Common Issues and Solutions
 - **Missing NuGet Packages**: If you see errors about missing packages, run `dotnet restore` again
 - **Database Errors**: Delete the database file if corrupted - it will be recreated on next run
-- **UI Rendering Issues**: Make sure you have the latest graphics drivers installed
 - **Build Errors**: Ensure you have the correct .NET SDK version installed (8.0+)
 
 If you encounter persistent issues, please submit an issue on the GitHub repository.
