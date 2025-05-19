@@ -106,7 +106,3 @@ The project follows MVVM architecture:
 - **Build Errors**: Ensure you have the correct .NET SDK version installed (8.0+)
 
 If you encounter persistent issues, please submit an issue on the GitHub repository.
-
-## 📄 License
-
-MIT License
