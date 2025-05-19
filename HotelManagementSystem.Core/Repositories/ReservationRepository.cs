@@ -8,12 +8,21 @@ using System.Threading.Tasks;
 
 namespace HotelManagementSystem.Core.Repositories
 {
+    /// <summary>
+    /// Repository implementation for Reservation entity operations.
+    /// Inherits from the generic <see cref="Repository{T}"/> class and implements the <see cref="IReservationRepository"/> interface.
+    /// </summary>
     public class ReservationRepository : Repository<Reservation>, IReservationRepository
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReservationRepository"/> class.
+        /// </summary>
+        /// <param name="context">The database context.</param>
         public ReservationRepository(HotelDbContext context) : base(context)
         {
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Reservation>> GetAllReservationsWithDetailsAsync()
         {
             return await _context.Reservations
@@ -23,6 +32,7 @@ namespace HotelManagementSystem.Core.Repositories
                 .ToListAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Reservation>> GetReservationsByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             return await _context.Reservations
@@ -36,6 +46,7 @@ namespace HotelManagementSystem.Core.Repositories
                 .ToListAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<int>> GetBookedRoomIdsAsync(DateTime checkIn, DateTime checkOut, int excludeReservationId = 0)
         {
             return await _context.Reservations
@@ -48,12 +59,14 @@ namespace HotelManagementSystem.Core.Repositories
                 .ToListAsync();
         }
         
+        /// <inheritdoc/>
         public async Task<bool> HasReservationsForRoomAsync(int roomId)
         {
             return await _context.Reservations
                 .AnyAsync(r => r.RoomId == roomId);
         }
         
+        /// <inheritdoc/>
         public async Task<bool> HasReservationsForCustomerAsync(int customerId)
         {
             return await _context.Reservations

@@ -5,6 +5,10 @@ using HotelManagementSystem.Core.Validation;
 
 namespace HotelManagementSystem.App.Views
 {
+    /// <summary>
+    /// User control for creating and editing room information.
+    /// Provides input validation for room properties.
+    /// </summary>
     public partial class RoomForm : UserControl
     {
         private TextBox? _roomNumberTextBox;
@@ -19,6 +23,10 @@ namespace HotelManagementSystem.App.Views
         private bool _isPriceValid = true;
         private bool _isCapacityValid = true;
         
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RoomForm"/> class.
+        /// Sets up control references and event handlers for input validation.
+        /// </summary>
         public RoomForm()
         {
             InitializeComponent();
@@ -65,8 +73,15 @@ namespace HotelManagementSystem.App.Views
             ValidateCapacity();
         }
 
+        /// <summary>
+        /// Initializes the XAML components of the control.
+        /// </summary>
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
         
+        /// <summary>
+        /// Validates the room number input.
+        /// Room numbers must not be empty and must contain only digits.
+        /// </summary>
         private void ValidateRoomNumber()
         {
             if (_roomNumberTextBox == null || _roomNumberErrorText == null) return;
@@ -94,6 +109,10 @@ namespace HotelManagementSystem.App.Views
             UpdateSaveButtonState();
         }
         
+        /// <summary>
+        /// Validates the price input.
+        /// Price must be a non-negative value.
+        /// </summary>
         private void ValidatePrice()
         {
             if (_priceTextBox == null || _priceErrorText == null) return;
@@ -127,6 +146,10 @@ namespace HotelManagementSystem.App.Views
             UpdateSaveButtonState();
         }
         
+        /// <summary>
+        /// Validates the capacity input.
+        /// Capacity must be at least 1.
+        /// </summary>
         private void ValidateCapacity()
         {
             if (_capacityTextBox == null || _capacityErrorText == null) return;
@@ -160,6 +183,10 @@ namespace HotelManagementSystem.App.Views
             UpdateSaveButtonState();
         }
         
+        /// <summary>
+        /// Updates the save button's enabled state based on the validation state of all inputs.
+        /// Disables the button and shows tooltip if there are validation errors.
+        /// </summary>
         private void UpdateSaveButtonState()
         {
             if (_saveButton == null) return;

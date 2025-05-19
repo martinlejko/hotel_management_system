@@ -7,23 +7,34 @@ using System.Threading.Tasks;
 
 namespace HotelManagementSystem.Core.Services
 {
+    /// <summary>
+    /// Service that provides hotel statistics and occupancy data.
+    /// Implements the <see cref="IHotelStatsService"/> interface.
+    /// </summary>
     public class HotelStatsService : IHotelStatsService
     {
         private readonly IRoomRepository _roomRepository;
         private readonly IReservationRepository _reservationRepository;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HotelStatsService"/> class.
+        /// </summary>
+        /// <param name="roomRepository">The repository for accessing room data.</param>
+        /// <param name="reservationRepository">The repository for accessing reservation data.</param>
         public HotelStatsService(IRoomRepository roomRepository, IReservationRepository reservationRepository)
         {
             _roomRepository = roomRepository;
             _reservationRepository = reservationRepository;
         }
 
+        /// <inheritdoc/>
         public async Task<OccupancyStats> GetCurrentOccupancyAsync()
         {
             var today = DateTime.Today;
             return await GetOccupancyStatsAsync(today, today.AddDays(1));
         }
 
+        /// <inheritdoc/>
         public async Task<OccupancyStats> GetOccupancyStatsAsync(DateTime startDate, DateTime endDate)
         {
             var allRooms = await _roomRepository.GetAllAsync();
@@ -48,6 +59,7 @@ namespace HotelManagementSystem.Core.Services
             };
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<OccupancyStats>> GetOccupancyStatsForDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             var result = new List<OccupancyStats>();

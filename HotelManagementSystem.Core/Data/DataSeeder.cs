@@ -6,15 +6,29 @@ using System.Threading.Tasks;
 
 namespace HotelManagementSystem.Core.Data
 {
+    /// <summary>
+    /// Provides functionality to seed the database with initial data.
+    /// Creates sample rooms, customers, and reservations when the application is first run.
+    /// </summary>
     public class DataSeeder
     {
         private readonly HotelDbContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataSeeder"/> class.
+        /// </summary>
+        /// <param name="context">The database context to be used for seeding data.</param>
+        /// <exception cref="ArgumentNullException">Thrown when context is null.</exception>
         public DataSeeder(HotelDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
+        /// <summary>
+        /// Seeds the database with initial data if it is empty.
+        /// Creates the database if it doesn't exist and adds sample rooms, customers, and reservations.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();

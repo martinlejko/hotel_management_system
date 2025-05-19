@@ -3,6 +3,10 @@ using System.Windows.Input;
 
 namespace HotelManagementSystem.App.ViewModels
 {
+    /// <summary>
+    /// View model for the room form.
+    /// Handles the data binding and logic for creating or editing room information.
+    /// </summary>
     public class RoomFormViewModel : ViewModelBase
     {
         private readonly Room? _originalRoom;
@@ -13,9 +17,19 @@ namespace HotelManagementSystem.App.ViewModels
         private string? _description;
         private bool _isAvailable = true;
         
+        /// <summary>
+        /// Event raised when a room is successfully saved.
+        /// </summary>
         public event Action<Room>? SaveCompleted;
+        
+        /// <summary>
+        /// Event raised when the user cancels the operation.
+        /// </summary>
         public event Action? CancelRequested;
         
+        /// <summary>
+        /// Gets or sets the room number.
+        /// </summary>
         public string RoomNumber
         {
             get => _roomNumber;
@@ -28,12 +42,19 @@ namespace HotelManagementSystem.App.ViewModels
             }
         }
         
+        /// <summary>
+        /// Gets or sets the selected room type.
+        /// </summary>
         public RoomType SelectedRoomType
         {
             get => _selectedRoomType;
             set => SetProperty(ref _selectedRoomType, value);
         }
         
+        /// <summary>
+        /// Gets or sets the room capacity (number of guests).
+        /// Enforces a minimum value of 1.
+        /// </summary>
         public int Capacity
         {
             get => _capacity;
@@ -47,6 +68,9 @@ namespace HotelManagementSystem.App.ViewModels
             }
         }
         
+        /// <summary>
+        /// Gets or sets the price per night for the room.
+        /// </summary>
         public decimal PricePerNight
         {
             get => _pricePerNight;
@@ -59,23 +83,43 @@ namespace HotelManagementSystem.App.ViewModels
             }
         }
         
+        /// <summary>
+        /// Gets or sets the description of the room.
+        /// </summary>
         public string? Description
         {
             get => _description;
             set => SetProperty(ref _description, value);
         }
         
+        /// <summary>
+        /// Gets or sets a value indicating whether the room is available for booking.
+        /// </summary>
         public bool IsAvailable
         {
             get => _isAvailable;
             set => SetProperty(ref _isAvailable, value);
         }
         
+        /// <summary>
+        /// Gets a collection of all available room types for selection.
+        /// </summary>
         public IEnumerable<RoomType> RoomTypes => Enum.GetValues<RoomType>();
         
+        /// <summary>
+        /// Gets the command to save the room information.
+        /// </summary>
         public ICommand SaveCommand { get; }
+        
+        /// <summary>
+        /// Gets the command to cancel the form operation.
+        /// </summary>
         public ICommand CancelCommand { get; }
         
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RoomFormViewModel"/> class.
+        /// </summary>
+        /// <param name="room">Optional existing room for editing. If null, a new room will be created.</param>
         public RoomFormViewModel(Room? room = null)
         {
             _originalRoom = room;
@@ -94,11 +138,19 @@ namespace HotelManagementSystem.App.ViewModels
             CancelCommand = new RelayCommand(_ => Cancel());
         }
         
+        /// <summary>
+        /// Determines whether the save command can be executed.
+        /// </summary>
+        /// <returns>True if all required fields have valid values; otherwise, false.</returns>
         private bool CanSave()
         {
             return !string.IsNullOrWhiteSpace(RoomNumber) && Capacity >= 1 && PricePerNight >= 0;
         }
         
+        /// <summary>
+        /// Saves the room information.
+        /// Creates a new room object or updates an existing one and raises the SaveCompleted event.
+        /// </summary>
         private void Save()
         {
             if (string.IsNullOrWhiteSpace(RoomNumber) || Capacity < 1)
@@ -117,6 +169,9 @@ namespace HotelManagementSystem.App.ViewModels
             SaveCompleted?.Invoke(room);
         }
         
+        /// <summary>
+        /// Cancels the form operation.
+        /// </summary>
         private void Cancel()
         {
             CancelRequested?.Invoke();

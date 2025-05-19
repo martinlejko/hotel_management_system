@@ -6,6 +6,10 @@ using HotelManagementSystem.Core.Validation;
 
 namespace HotelManagementSystem.App.Views
 {
+    /// <summary>
+    /// User control for creating and editing customer information.
+    /// Provides input validation for customer properties.
+    /// </summary>
     public partial class CustomerForm : UserControl
     {
         private TextBox? _emailTextBox;
@@ -25,6 +29,10 @@ namespace HotelManagementSystem.App.Views
         private bool _isFirstNameValid = true;
         private bool _isLastNameValid = true;
         
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomerForm"/> class.
+        /// Sets up control references and event handlers for input validation.
+        /// </summary>
         public CustomerForm()
         {
             InitializeComponent();
@@ -64,11 +72,18 @@ namespace HotelManagementSystem.App.Views
             ValidateAllFields();
         }
 
+        /// <summary>
+        /// Initializes the XAML components of the control.
+        /// </summary>
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
         }
         
+        /// <summary>
+        /// Validates the email input.
+        /// Email must be a properly formatted email address.
+        /// </summary>
         private void ValidateEmail()
         {
             if (_emailTextBox == null || _emailErrorText == null) return;
@@ -81,6 +96,10 @@ namespace HotelManagementSystem.App.Views
             UpdateSaveButtonState();
         }
         
+        /// <summary>
+        /// Validates the phone number input.
+        /// Phone number must be properly formatted if provided, but is optional.
+        /// </summary>
         private void ValidatePhone()
         {
             if (_phoneTextBox == null || _phoneErrorText == null) return;
@@ -102,6 +121,10 @@ namespace HotelManagementSystem.App.Views
             UpdateSaveButtonState();
         }
         
+        /// <summary>
+        /// Validates the first name input.
+        /// First name is required and cannot be empty.
+        /// </summary>
         private void ValidateFirstName()
         {
             if (_firstNameTextBox == null || _firstNameErrorText == null) return;
@@ -114,6 +137,10 @@ namespace HotelManagementSystem.App.Views
             UpdateSaveButtonState();
         }
         
+        /// <summary>
+        /// Validates the last name input.
+        /// Last name is required and cannot be empty.
+        /// </summary>
         private void ValidateLastName()
         {
             if (_lastNameTextBox == null || _lastNameErrorText == null) return;
@@ -126,6 +153,9 @@ namespace HotelManagementSystem.App.Views
             UpdateSaveButtonState();
         }
         
+        /// <summary>
+        /// Validates all input fields in the form.
+        /// </summary>
         private void ValidateAllFields()
         {
             ValidateFirstName();
@@ -134,6 +164,14 @@ namespace HotelManagementSystem.App.Views
             ValidatePhone();
         }
         
+        /// <summary>
+        /// Updates the visual state of an input field based on validation result.
+        /// Adds or removes the "invalid" class and sets appropriate error messages.
+        /// </summary>
+        /// <param name="textBox">The text box to update.</param>
+        /// <param name="errorText">The error text block to update.</param>
+        /// <param name="isValid">Whether the input is valid.</param>
+        /// <param name="errorMessage">The error message to display if invalid.</param>
         private void UpdateValidationVisuals(TextBox textBox, TextBlock errorText, bool isValid, string errorMessage)
         {
             if (isValid)
@@ -150,6 +188,10 @@ namespace HotelManagementSystem.App.Views
             }
         }
         
+        /// <summary>
+        /// Updates the save button's enabled state based on the validation state of all inputs.
+        /// Disables the button and shows tooltip if there are validation errors.
+        /// </summary>
         private void UpdateSaveButtonState()
         {
             if (_saveButton == null) return;

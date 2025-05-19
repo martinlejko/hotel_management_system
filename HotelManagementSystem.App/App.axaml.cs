@@ -11,13 +11,24 @@ using System.Threading.Tasks;
 
 namespace HotelManagementSystem.App
 {
+    /// <summary>
+    /// Main application class for the Hotel Management System.
+    /// Handles application startup, initialization, and database setup.
+    /// </summary>
     public partial class App : Application
     {
+        /// <summary>
+        /// Initializes the application and loads XAML resources.
+        /// </summary>
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
         }
         
+        /// <summary>
+        /// Called when the application's framework initialization is complete.
+        /// Sets up the database, initializes the main window, and configures the view model.
+        /// </summary>
         public override void OnFrameworkInitializationCompleted()
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -38,6 +49,10 @@ namespace HotelManagementSystem.App
             base.OnFrameworkInitializationCompleted();
         }
 
+        /// <summary>
+        /// Initializes the database by ensuring it exists and seeding it with initial data if necessary.
+        /// </summary>
+        /// <param name="options">The database context options.</param>
         private async void InitializeDatabase(DbContextOptions<HotelDbContext> options)
         {
             using (var db = new HotelDbContext(options))
@@ -47,6 +62,10 @@ namespace HotelManagementSystem.App
             }
         }
 
+        /// <summary>
+        /// Creates and configures the database context options for SQLite.
+        /// </summary>
+        /// <returns>The configured database context options.</returns>
         private DbContextOptions<HotelDbContext> CreateDatabaseOptions()
         {
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
