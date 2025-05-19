@@ -38,16 +38,17 @@ This guide provides instructions for using the Hotel Management System.
 3. Fill in the customer details:
    - First Name (required)
    - Last Name (required)
-   - Email Address
+   - Email Address (required)
    - Phone Number
    - Address information
+   - Date of Birth
 4. Click "Save" to add the customer
 
-### Finding a Customer
+### Finding / Editing a Customer
 
 1. Navigate to the Customers section
-2. Use the search box to filter customers by name
-3. Click on a customer to view their details
+2. Use the header to sort by your liking
+3. Click on a customer and follow by clicking the edit button
 
 ## Reservation Management
 
@@ -55,23 +56,8 @@ This guide provides instructions for using the Hotel Management System.
 
 1. Navigate to the Reservations section from the main menu
 2. Click the "New Reservation" button
-3. Select or search for a customer
-4. Choose available room(s)
+3. Select a customer
+4. Choose available room
 5. Set check-in and check-out dates
 6. Add any special requests
 7. Click "Create Reservation" to confirm
-
-### Check-in Process
-
-1. Navigate to the Reservations section
-2. Find the reservation by searching for the customer name or room number
-3. Click on the reservation to view details
-4. Click the "Check In" button to mark the guest as checked in
-
-### Check-out Process
-
-1. Navigate to the Reservations section
-2. Find the customer's active reservation
-3. Click the "Check Out" button
-4. Review and finalize any changes to the bill
-5. Confirm check-out 
