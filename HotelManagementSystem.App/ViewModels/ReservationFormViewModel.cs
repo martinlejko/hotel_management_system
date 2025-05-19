@@ -196,7 +196,7 @@ namespace HotelManagementSystem.App.ViewModels
             SaveCommand = new RelayCommand(_ => Save(), _ => CanSave());
             CancelCommand = new RelayCommand(_ => Cancel());
             
-            Task.Run(async () => await LoadInitialDataAsync());
+            Task.Run(LoadInitialDataAsync);
         }
         
         /// <summary>
@@ -269,7 +269,9 @@ namespace HotelManagementSystem.App.ViewModels
                         CheckOutDate,
                         _originalReservation?.Id ?? 0);
                     
-                    var availableRooms = allRooms.Where(r => r.IsAvailable && !bookedRoomIds.Contains(r.Id)).ToList();
+                    var availableRooms = allRooms.Where(r => 
+                        r.IsAvailable && 
+                        !bookedRoomIds.Contains(r.Id)).ToList();
                     
                     await Dispatcher.UIThread.InvokeAsync(() =>
                     {
@@ -281,11 +283,10 @@ namespace HotelManagementSystem.App.ViewModels
                         
                         if (_originalReservation != null && _originalReservation.RoomId > 0)
                         {
-                            // If editing an existing reservation, include the original room
-                            var originalRoom = allRooms.FirstOrDefault(r => r.Id == _originalReservation.RoomId);
-                            if (originalRoom != null && !AvailableRooms.Any(r => r.Id == originalRoom.Id))
+                            var currentRoom = allRooms.FirstOrDefault(r => r.Id == _originalReservation.RoomId);
+                            if (currentRoom != null && !AvailableRooms.Contains(currentRoom))
                             {
-                                AvailableRooms.Add(originalRoom);
+                                AvailableRooms.Add(currentRoom);
                             }
                             
                             SelectedRoom = AvailableRooms.FirstOrDefault(r => r.Id == _originalReservation.RoomId);
@@ -293,10 +294,6 @@ namespace HotelManagementSystem.App.ViewModels
                         else if (AvailableRooms.Count > 0)
                         {
                             SelectedRoom = AvailableRooms[0];
-                        }
-                        else
-                        {
-                            SelectedRoom = null;
                         }
                         
                         CalculateTotalPrice();
@@ -315,16 +312,14 @@ namespace HotelManagementSystem.App.ViewModels
         /// </summary>
         private void CalculateTotalPrice()
         {
-            if (SelectedRoom == null)
+            if (SelectedRoom != null)
             {
-                TotalPrice = 0;
-                return;
+                int days = (CheckOutDate - CheckInDate).Days;
+                if (days > 0)
+                {
+                    TotalPrice = SelectedRoom.PricePerNight * days;
+                }
             }
-            
-            int days = (CheckOutDate - CheckInDate).Days;
-            if (days <= 0) days = 1;
-            
-            TotalPrice = SelectedRoom.PricePerNight * days;
         }
         
         /// <summary>
@@ -342,7 +337,7 @@ namespace HotelManagementSystem.App.ViewModels
         /// </summary>
         private void Save()
         {
-            if (SelectedCustomer == null || SelectedRoom == null || CheckOutDate <= CheckInDate)
+            if (SelectedCustomer == null || SelectedRoom == null)
             {
                 return;
             }
@@ -356,9 +351,10 @@ namespace HotelManagementSystem.App.ViewModels
             reservation.TotalPrice = TotalPrice;
             reservation.SpecialRequests = SpecialRequests;
             
-            if (_originalReservation == null)
+            if (_originalReservation != null)
             {
-                reservation.CreatedAt = DateTime.Now;
+                reservation.Customer = SelectedCustomer;
+                reservation.Room = SelectedRoom;
             }
             
             SaveCompleted?.Invoke(reservation);

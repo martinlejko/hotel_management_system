@@ -106,3 +106,34 @@ The project follows MVVM architecture:
 - **Build Errors**: Ensure you have the correct .NET SDK version installed (8.0+)
 
 If you encounter persistent issues, please submit an issue on the GitHub repository.
+
+# Hotel Management System Documentation
+
+This repository contains the documentation for the Hotel Management System application. The documentation is generated from XML comments in the codebase using DocFX.
+
+## Building the Documentation
+
+To build the documentation:
+
+1. Ensure you have the DocFX tool installed:
+   ```
+   dotnet tool install --global docfx
+   ```
+
+2. Build the documentation:
+   ```
+   docfx docfx.json
+   ```
+
+3. Preview the documentation locally:
+   ```
+   docfx docfx.json --serve
+   ```
+
+   Then navigate to `http://localhost:8080` in your web browser.
+
+## Documentation Structure
+
+- **API Documentation** - Generated from XML comments in the code
+- **Articles** - Conceptual documentation about the system architecture and usage
+- **Getting Started** - Instructions for using the application

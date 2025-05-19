@@ -52,3 +52,10 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# DocFX
+_site/
+docs/api/*.yml
+docs/api/toc.yml
+docs/api/index.json
+.manifest
